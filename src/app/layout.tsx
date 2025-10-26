@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Image from "next/image";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* <div className="absolute opacity-100 pointer-events-none top-0 left-0 w-full h-[50vh] -z-10 overflow-hidden">
+          <Image src="/sitepage1.png" className="bg-transparent w-full h-full object-cover" alt="something" width={1920} height={1080} />
+        
+          <div className="absolute bottom-0 left-0 w-full h-40 bg-linear-to-b from-transparent to-[#ffecec] pointer-events-none"></div>
+        </div> */}
         {children}
       </body>
     </html>
