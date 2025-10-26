@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+::selection { 
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
 :root {
   --background: oklch(0.9582 0.0207 17.5194);
   --foreground: oklch(0.1685 0.0801 265.6614);
