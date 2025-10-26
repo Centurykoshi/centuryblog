@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader } from "../ui/card";
 import { Input } from "../ui/input";
-import { Eye, EyeClosed, EyeIcon, EyeOffIcon, LetterText, Loader, User } from "lucide-react";
+import { Eye, EyeClosed, EyeIcon, EyeOffIcon, LetterText, Loader, Loader2, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
@@ -18,6 +18,27 @@ export default function AdminSignup() {
     const [showPassword, setshowPassword] = useState<boolean>(false);
     const [isloading, setisloading] = useState<boolean>(false);
     const router = useRouter();
+
+    const handlegoogleSingUp = async (e: React.FormEvent) => {
+        setisloading(true);
+        e.preventDefault();
+
+        try {
+            await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "/",
+
+            });
+
+            toast.success("Redirecting to your editing schedule...");
+        }
+        catch (error: any) {
+            toast.error("Failed to sign in with Google: " + error.message);
+        }
+        finally {
+            setisloading(false);
+        }
+    }
 
     const handleEmailSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -74,6 +95,15 @@ export default function AdminSignup() {
                 </CardHeader>
 
                 <CardContent className="space-y-2 min-w-sm">
+
+                    <Button
+                        variant={"outline"}
+                        disabled={isloading}
+                        onClick={handlegoogleSingUp}
+                        className="w-full mb-4 flex items-center justify-center gap-2 h-10 text-sm">
+                        {isloading ? <Loader2 className="mr-2 h-4 w-2 animate-spin" /> : "Continue with Google"}
+
+                    </Button>
 
 
 
