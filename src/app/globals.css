@@ -1,5 +1,5 @@
-@import '../styles/_variables.scss';
-@import '../styles/_keyframe-animations.scss';
+/* @import '../styles/_variables.scss';
+@import '../styles/_keyframe-animations.scss'; */
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -10,7 +10,6 @@
   background-color: var(--primary);
   color: var(--primary-foreground);
 }
-
 :root {
   --background: oklch(0.9582 0.0207 17.5194);
   --foreground: oklch(0.1685 0.0801 265.6614);
