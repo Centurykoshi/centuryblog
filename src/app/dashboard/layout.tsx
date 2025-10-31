@@ -1,21 +1,13 @@
-import { AppHeader } from "@/components/My Components/Dashboard/AppHeader"
-import SidebarDashboard from "@/components/My Components/Dashboard/Sidebar"
+import { AppSidebar } from "@/components/My Components/Dashboard/AppHeader"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-
+      <AppSidebar />
       <main>
         <SidebarTrigger />
-        <div className="z-10">
-          <AppHeader />
-        </div>
-
-        <SidebarDashboard />
-
-
         {children}
       </main>
     </SidebarProvider>
