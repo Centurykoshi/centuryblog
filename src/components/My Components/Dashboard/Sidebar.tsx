@@ -46,10 +46,10 @@ export default function SidebarDashboard() {
                                             }}
                                             transition={{ duration: 0.6 }}
                                         >
-                                          
+
                                             <sidebar.icon className="h-4 w-4" />
                                         </motion.div>
-                                        
+
                                         <span>{sidebar.name}</span>
                                     </motion.div>
                                 </SidebarMenuButton>
