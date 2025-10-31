@@ -13,19 +13,94 @@ enum UserRole {
   ADMIN
 }
 
-
 model Post {
+  id          String     @id @default(uuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  slug        String     @unique
+  title       String
+  excerpt     String? // Short description for SEO and previews
+  contentJSON Json // TipTap editor content
+  contentHTML String     @db.Text // Rendered HTML for display
+  featuredImg String?
+  status      PostStatus @default(DRAFT)
+  published   DateTime?
+
+  // SEO fields
+  metaTitle       String?
+  metaDescription String?
+
+  // Analytics
+  viewCount   Int @default(0)
+  readingTime Int @default(0) // in minutes
+
+  // Author relationship
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  tags     PostTag[]
+  comments Comment[]
+
+  // Indexes for performance
+  @@index([status])
+  @@index([published])
+  @@index([userId])
+  @@index([slug])
+  @@map("posts")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  color       String? // Hex color for tag styling
+  createdAt   DateTime  @default(now())
+  posts       PostTag[]
+
+  @@index([name])
+}
+
+model PostTag {
+  postID String
+  tagID  String
+
+  post Post @relation(fields: [postID], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagID], references: [id], onDelete: Cascade)
+
+  @@id([postID, tagID])
+}
+
+model Comment {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title   String
-  content String
+  message String @db.Text
+  // approved Boolean @default(false) // Moderation
 
-  userId String
+  // Relations
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 
-  @@map("posts")
+  // Threading support (replies to comments)
+  // parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  // parentId String?
+  // replies  Comment[] @relation("CommentReplies")
+  // @@index([approved])
+
+  @@index([postId])
+  @@index([userId])
 }
 
 model User {
@@ -33,23 +108,23 @@ model User {
   createdAt DateTime
   updatedAt DateTime
 
-  name                 String
-  email                String                @unique
-  emailVerified        Boolean
-  image                String?
-  age                  Int?
-  gender               String?
-  profileCompleted     Boolean               @default(false)
-  role                 UserRole              @default(USER)
-  banned               Boolean?
-  banReason            String?
-  banExpires           DateTime?
+  name             String
+  email            String    @unique
+  emailVerified    Boolean
+  image            String?
+  age              Int?
+  gender           String?
+  profileCompleted Boolean   @default(false)
+  role             UserRole  @default(USER)
+  banned           Boolean?
+  banReason        String?
+  banExpires       DateTime?
 
-  accounts             Account[]
-  sessions             Session[]
-  posts                Post[]
-
-
+  accounts Account[]
+  sessions Session[]
+  posts    Post[]
+  comments Comment[]
+  Media    Media[]
 
   @@map("users")
 }
@@ -69,6 +144,14 @@ model Session {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  url          String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  uploadedById String
+  createdAt    DateTime @default(now())
 }
 
 model Account {
