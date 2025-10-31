@@ -3,9 +3,11 @@
 import { useState } from "react"
 import { Button } from "../ui/button"
 import { cn } from "@/lib/utils"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import BlogCard from "./BlogCard"
 import { blogPosts } from "@/data/blogPosts"
+import { ArrowRight } from "lucide-react"
+import Link from "next/link"
 
 export default function Blogging() {
     const Category = [
@@ -18,15 +20,29 @@ export default function Blogging() {
     ]
 
     const [iscategory, setIscategory] = useState("All");
-    
+
+
 
     return (
-        <div className="flex  gap-3 sm:gap-6 relative flex-col">
-            <div className="flex gap-3 justify-center sm:gap-6">
-                {Category.map((category) => (
+        <motion.div
+            className="flex  gap-3 sm:gap-6 relative flex-col mb-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+        >
+            <motion.div
+                className="flex gap-3 justify-center sm:gap-6"
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+            >
+                {Category.map((category, index) => (
                     <motion.div
                         key={category.name}
                         className="relative border-none"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.1, duration: 0.3 }}
                         whileHover={{ scale: 0.9 }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -50,23 +66,62 @@ export default function Blogging() {
                         </Button>
                     </motion.div>
                 ))}
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 ">
+
+                <div className="">
+
+                    <div className="flex mb-4 ml-[30vh]  flex-col lg:ml-[30vh] gap-6 mt-10 sm:ml-[10vh]">
+
+                        <h2 className="text-2xl font-sans text-secondary-foreground">Articles and Blogs</h2>
+
+                    </div>
+
+
+
+                    <div className="flex flex-col ml-[30vh] sm:ml-[10vh] gap-6 lg:ml-[30vh] ">
+                        {blogPosts.filter((blog) => iscategory === "All" || blog.category === iscategory).map((blog) => <BlogCard blog={blog} key={blog._id} onTitleClick={setIscategory} />)}
+
+                    </div>
+                </div>
+
+
+                <div className="mt-10">
+                    <div className="flex flex-col gap-6 mt-10 sm:ml-[10vh] sticky top-20 self-start">
+                        <div className="flex justify-center">
+                            <div className="flex-col flex gap-10">
+                                <h2 className="text-xl font-sans text-secondary-foreground"> Popular Content </h2>
+
+                                <div className="flex flex-col gap-2">
+
+                                    {blogPosts.map((blog) => (
+                                        <Link
+                                            key={blog._id}
+                                            href={`/blog/${blog.title}`}
+                                            className="group inline-block no-underline transition-colors hover:text-secondary-foreground"
+                                        >
+                                            <motion.div
+                                                className="inline-block"
+                                                initial={{ x: 0 }}
+                                                animate={{ x: 0 }}
+                                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                            >
+                                                <ArrowRight className="w-6 h-6 inline mb-2 mr-2 transition-all duration-300 group-hover:translate-x-2 " />
+                                            </motion.div>
+                                            <span className="inline text-xl font-semibold ">
+                                                {blog.title}
+                                            </span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div className="flex  ml-[30vh] p-2 flex-col lg:ml-[30vh] gap-6 mt-10 sm:ml-[10vh]">
-
-                <h2 className="text-2xl font-sans">Articles and Blogs</h2>
-
-            </div>
-
-
-
-            <div className="flex flex-col ml-[30vh] sm:ml-[10vh] gap-6 lg:ml-[30vh] ">
-                {blogPosts.filter((blog) => iscategory === "All" || blog.category === iscategory).map((blog) => <BlogCard blog={blog} key={blog._id} onTitleClick={setIscategory} />)}
-
-            </div>
-
-
-        </div >
+        </motion.div >
 
     )
 }

@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Header from "./header";
 import Blogging from "./Blogging";
 import Model from "./model";
+import Footer from "./footer";
 
 
 export default function Frontpage() {
@@ -23,6 +24,7 @@ export default function Frontpage() {
             <Header />
             <Model />
             <Blogging />
+            <Footer />
 
 
 
