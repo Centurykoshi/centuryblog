@@ -7,7 +7,7 @@ export default function EditingPage() {
     <>
       <div className='flex-col items-center h-screen w-screen'>
         <div className='fixed top-0 left-1/4 min-w-3xl'>
-          <MyCoverImage />
+          {/* <MyCoverImage /> */}
         </div>
 
       </div>
