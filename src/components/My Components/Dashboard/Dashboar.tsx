@@ -6,7 +6,7 @@ export default function Dashboard() {
         <>
 
             <SidebarDashboard />
-            <EditingPage />
+            {/* <EditingPage /> */}
         </>
     )
 }
