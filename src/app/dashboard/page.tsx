@@ -1,7 +1,8 @@
 import Dashboard from "@/components/My Components/Dashboard/Dashboar";
 
-export default function DASHBOARDPage() {
+export default function DashboardPage() {
     return (
-        <Dashboard />
+        <>
+        </>
     )
 }
