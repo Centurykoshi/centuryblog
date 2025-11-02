@@ -13,11 +13,14 @@ enum UserRole {
   ADMIN
 }
 
-model Post {
-  id          String     @id @default(uuid())
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+model Document {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   slug        String     @unique
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String
   excerpt     String? // Short description for SEO and previews
   contentJSON Json // TipTap editor content
@@ -25,6 +28,18 @@ model Post {
   featuredImg String?
   status      PostStatus @default(DRAFT)
   published   DateTime?
+
+  @@index([status])
+  @@index([published])
+  @@index([userId])
+  @@index([slug])
+  @@map("documents")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // SEO fields
   metaTitle       String?
@@ -43,10 +58,7 @@ model Post {
   comments Comment[]
 
   // Indexes for performance
-  @@index([status])
-  @@index([published])
-  @@index([userId])
-  @@index([slug])
+
   @@map("posts")
 }
 
@@ -63,19 +75,23 @@ model Tag {
   description String?
   color       String? // Hex color for tag styling
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   posts       PostTag[]
 
   @@index([name])
+  @@index([slug])
+  @@map("tags")
 }
 
 model PostTag {
-  postID String
-  tagID  String
+  postId String
+  tagId  String
 
-  post Post @relation(fields: [postID], references: [id], onDelete: Cascade)
-  tag  Tag  @relation(fields: [tagID], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
-  @@id([postID, tagID])
+  @@id([postId, tagId])
+  @@map("post_tags")
 }
 
 model Comment {
@@ -105,34 +121,37 @@ model Comment {
 
 model User {
   id        String   @id @default(uuid())
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   name             String
   email            String    @unique
-  emailVerified    Boolean
+  emailVerified    Boolean   @default(false)
   image            String?
   age              Int?
   gender           String?
   profileCompleted Boolean   @default(false)
   role             UserRole  @default(USER)
-  banned           Boolean?
+  banned           Boolean   @default(false)
   banReason        String?
   banExpires       DateTime?
 
-  accounts Account[]
-  sessions Session[]
-  posts    Post[]
-  comments Comment[]
-  Media    Media[]
+  accounts  Account[]
+  sessions  Session[]
+  posts     Post[]
+  comments  Comment[]
+  media     Media[]
+  documents Document[]
 
+  @@index([email])
+  @@index([role])
   @@map("users")
 }
 
 model Session {
   id        String   @id @default(uuid())
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   expiresAt      DateTime
   token          String   @unique
@@ -143,6 +162,9 @@ model Session {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
   @@map("sessions")
 }
 
@@ -156,8 +178,8 @@ model Media {
 
 model Account {
   id        String   @id @default(uuid())
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   accountId             String
   providerId            String
@@ -172,17 +194,21 @@ model Account {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([accountId, providerId])
+  @@index([userId])
   @@map("accounts")
 }
 
 model Verification {
-  id        String    @id @default(uuid())
-  createdAt DateTime?
-  updatedAt DateTime?
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   identifier String
   value      String
   expiresAt  DateTime
 
+  @@unique([identifier, value])
+  @@index([expiresAt])
   @@map("verifications")
 }
