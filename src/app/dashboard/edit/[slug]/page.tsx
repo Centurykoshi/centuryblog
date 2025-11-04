@@ -8,4 +8,6 @@ export default function EditPage() {
             <MainEditPage />
         </>
     )
+    
 }
+
