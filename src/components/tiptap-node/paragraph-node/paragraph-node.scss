@@ -200,7 +200,8 @@
     &:not(:has(img)) {
       border-radius: 0.25rem;
       border-bottom: 0.125rem dashed var(--tt-color-yellow-base);
-      padding-bottom: 0.5rem;
+      border-top: 0.125rem dashed var(--tt-color-yellow-base);
+      // padding-bottom: 0.5rem;
       outline: 0.25rem solid transparent;
 
       &.tiptap-thread--hovered,

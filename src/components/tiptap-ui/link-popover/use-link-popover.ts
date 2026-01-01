@@ -189,7 +189,7 @@ export function useLinkState(props: {
   const canSet = canSetLink(editor)
   const isActive = isLinkActive(editor)
 
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     if (!editor) return

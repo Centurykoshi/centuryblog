@@ -92,57 +92,59 @@ export default function SidebarDashboard() {
                                                 }}
                                                 className="overflow-hidden"
                                             >
-                                                {subSidebar.map((sidebar, index) => (
-                                                    <motion.div
-                                                        key={sidebar.name}
-                                                        initial={{ x: -20, opacity: 0 }}
-                                                        animate={{ x: 0, opacity: 1 }}
-                                                        transition={{
-                                                            delay: index * 0.1,
-                                                            duration: 0.2,
-                                                            ease: "easeOut"
-                                                        }}
-                                                    >
-                                                        <SidebarMenuItem>
-                                                            <SidebarMenuButton asChild>
-                                                                <motion.div
-                                                                    className="flex items-center cursor-pointer text-xs text-secondary-foreground p-2 rounded-lg hover:bg-accent/50 transition-colors duration-200 pl-8"
-                                                                    whileHover="hover"
-                                                                    whileTap={{ scale: 0.95 }}
-                                                                    variants={{
-                                                                        hover: {
-                                                                            x: 6,
-                                                                            backgroundColor: "rgba(var(--accent))",
-                                                                        }
-                                                                    }}
-                                                                    transition={{ duration: 0.2 }}
-                                                                >
+                                                {/* Create nested SidebarMenu for sub-items */}
+                                                <SidebarMenu className="ml-4">
+                                                    {subSidebar.map((sidebar, index) => (
+                                                        <SidebarMenuItem key={sidebar.name}>
+                                                            <motion.div
+                                                                initial={{ x: -20, opacity: 0 }}
+                                                                animate={{ x: 0, opacity: 1 }}
+                                                                transition={{
+                                                                    delay: index * 0.1,
+                                                                    duration: 0.2,
+                                                                    ease: "easeOut"
+                                                                }}
+                                                            >
+                                                                <SidebarMenuButton asChild>
                                                                     <motion.div
-                                                                        className="mr-3"
+                                                                        className="flex items-center cursor-pointer text-xs text-secondary-foreground p-2 rounded-lg hover:bg-accent/50 transition-colors duration-200"
+                                                                        whileHover="hover"
+                                                                        whileTap={{ scale: 0.95 }}
                                                                         variants={{
                                                                             hover: {
-                                                                                rotate: 360,
-                                                                                scale: 1.1
+                                                                                x: 6,
+                                                                                backgroundColor: "rgba(var(--accent))",
                                                                             }
                                                                         }}
-                                                                        transition={{ duration: 0.6 }}
+                                                                        transition={{ duration: 0.2 }}
                                                                     >
-                                                                        <sidebar.icon className="h-3 w-3" />
+                                                                        <motion.div
+                                                                            className="mr-3"
+                                                                            variants={{
+                                                                                hover: {
+                                                                                    rotate: 360,
+                                                                                    scale: 1.1
+                                                                                }
+                                                                            }}
+                                                                            transition={{ duration: 0.6 }}
+                                                                        >
+                                                                            <sidebar.icon className="h-3 w-3" />
+                                                                        </motion.div>
+                                                                        <motion.span
+                                                                            variants={{
+                                                                                hover: {
+                                                                                    scale: 1.05
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            {sidebar.name}
+                                                                        </motion.span>
                                                                     </motion.div>
-                                                                    <motion.span
-                                                                        variants={{
-                                                                            hover: {
-                                                                                scale: 1.05
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        {sidebar.name}
-                                                                    </motion.span>
-                                                                </motion.div>
-                                                            </SidebarMenuButton>
+                                                                </SidebarMenuButton>
+                                                            </motion.div>
                                                         </SidebarMenuItem>
-                                                    </motion.div>
-                                                ))}
+                                                    ))}
+                                                </SidebarMenu>
                                             </motion.div>
                                         </CollapsibleContent>
                                     </SidebarMenuItem>
