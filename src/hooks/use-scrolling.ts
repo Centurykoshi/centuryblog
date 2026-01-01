@@ -35,7 +35,7 @@ export function useScrolling(
       el: EventTargetWithScroll,
       event: string,
       handler: EventListener
-    ) => el.addEventListener(event, handler, { passive: true })
+    ) => el.addEventListener(event, handler, true)
 
     const off = (
       el: EventTargetWithScroll,

@@ -25,9 +25,9 @@ export function ThemeToggle() {
     setIsDarkMode(initialDarkMode)
   }, [])
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode)
-  }, [isDarkMode])
+  // useEffect(() => {
+  //   document.documentElement.classList.toggle("dark", isDarkMode)
+  // }, [isDarkMode])
 
   const toggleDarkMode = () => setIsDarkMode((isDark) => !isDark)
 

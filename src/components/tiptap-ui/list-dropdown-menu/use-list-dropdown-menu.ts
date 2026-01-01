@@ -168,7 +168,7 @@ export function useListDropdownMenu(config?: UseListDropdownMenuConfig) {
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
   const listInSchema = types.some((type) => isNodeInSchema(type, editor))
 

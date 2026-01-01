@@ -4,7 +4,7 @@ import { forwardRef, useCallback, useEffect, useState } from "react"
 import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
 // --- Icons ---
@@ -110,7 +110,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
   openLink,
   isActive,
 }) => {
-  const isMobile = useIsMobile()
+  const isMobile = useIsBreakpoint()
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {

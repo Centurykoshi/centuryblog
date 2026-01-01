@@ -60,7 +60,7 @@ import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
 import { LinkIcon } from "@/components/tiptap-icons/link-icon"
 
 // --- Hooks ---
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
 import { useWindowSize } from "@/hooks/use-window-size"
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 
@@ -184,7 +184,7 @@ const MobileToolbarContent = ({
 )
 
 export function SimpleEditor() {
-  const isMobile = useIsMobile()
+  const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main"
@@ -193,7 +193,6 @@ export function SimpleEditor() {
 
   const editor = useEditor({
     immediatelyRender: false,
-    shouldRerenderOnTransaction: false,
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -224,7 +223,7 @@ export function SimpleEditor() {
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
-        limit: 3,
+        limit: 10,
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
@@ -251,8 +250,8 @@ export function SimpleEditor() {
           style={{
             ...(isMobile
               ? {
-                bottom: `calc(100% - ${height - rect.y}px)`,
-              }
+                  bottom: `calc(100% - ${height - rect.y}px)`,
+                }
               : {}),
           }}
         >

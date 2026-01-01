@@ -1,4 +1,4 @@
-import type { Node as TiptapNode } from "@tiptap/pm/model"
+import type { Node as PMNode } from "@tiptap/pm/model"
 import type { Transaction } from "@tiptap/pm/state"
 import {
   AllSelection,
@@ -6,9 +6,14 @@ import {
   Selection,
   TextSelection,
 } from "@tiptap/pm/state"
-import type { Editor, NodeWithPos } from "@tiptap/react"
+import { cellAround, CellSelection } from "@tiptap/pm/tables"
+import {
+  findParentNodeClosestToPos,
+  type Editor,
+  type NodeWithPos,
+} from "@tiptap/react"
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+export const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 export const MAC_SYMBOLS: Record<string, string> = {
   mod: "⌘",
@@ -225,9 +230,9 @@ export function findNodeAtPosition(editor: Editor, position: number) {
  */
 export function findNodePosition(props: {
   editor: Editor | null
-  node?: TiptapNode | null
+  node?: PMNode | null
   nodePos?: number | null
-}): { pos: number; node: TiptapNode } | null {
+}): { pos: number; node: PMNode } | null {
   const { editor, node, nodePos } = props
 
   if (!editor || !editor.state?.doc) return null
@@ -243,7 +248,7 @@ export function findNodePosition(props: {
   // First search for the node in the document if we have a node
   if (hasValidNode) {
     let foundPos = -1
-    let foundNode: TiptapNode | null = null
+    let foundNode: PMNode | null = null
 
     editor.state.doc.descendants((currentNode, pos) => {
       // TODO: Needed?
@@ -369,34 +374,60 @@ export const handleImageUpload = async (
     )
   }
 
-  // Check if file is an image
-  if (!file.type.startsWith('image/')) {
-    throw new Error("File must be an image")
+  try {
+    // Start progress
+    onProgress?.({ progress: 10 })
+
+    // Create FormData for upload
+    const formData = new FormData()
+    formData.append('file', file)
+
+    onProgress?.({ progress: 30 })
+
+    // Upload to your API endpoint
+    const response = await fetch('/api/upload-image', {
+      method: 'POST',
+      body: formData,
+      signal: abortSignal
+    })
+
+    onProgress?.({ progress: 70 })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Upload failed')
+    }
+
+    const data = await response.json()
+
+    onProgress?.({ progress: 100 })
+
+    if (!data.success) {
+      throw new Error(data.message || 'Upload failed')
+    }
+
+    console.log('✅ Image uploaded successfully:', data.url)
+    return data.url
+
+  } catch (error) {
+    console.error('❌ Image upload failed:', error)
+
+    // Fallback to base64 if API upload fails
+    console.log('📝 Falling back to base64...')
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+
+      reader.onload = () => {
+        resolve(reader.result as string)
+      }
+
+      reader.onerror = () => {
+        reject(new Error("Failed to read file"))
+      }
+
+      reader.readAsDataURL(file)
+    })
   }
-
-  // Convert image to base64 data URL for immediate use
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.onload = () => {
-      // Simulate progress for demo
-      onProgress?.({ progress: 100 })
-      resolve(reader.result as string)
-    }
-
-    reader.onerror = () => {
-      reject(new Error("Failed to read file"))
-    }
-
-    // Check if upload was cancelled
-    if (abortSignal?.aborted) {
-      reject(new Error("Upload cancelled"))
-      return
-    }
-
-    // Start reading the file
-    reader.readAsDataURL(file)
-  })
 }
 
 type ProtocolOptions = {
@@ -568,4 +599,57 @@ export function selectCurrentBlockContent(editor: Editor) {
       }
     }
   }
+}
+
+/**
+ * Retrieves all nodes of specified types from the current selection.
+ * @param selection The current editor selection
+ * @param allowedNodeTypes An array of node type names to look for (e.g., ["image", "table"])
+ * @returns An array of objects containing the node and its position
+ */
+export function getSelectedNodesOfType(
+  selection: Selection,
+  allowedNodeTypes: string[]
+): NodeWithPos[] {
+  const results: NodeWithPos[] = []
+  const allowed = new Set(allowedNodeTypes)
+
+  if (selection instanceof CellSelection) {
+    selection.forEachCell((node: PMNode, pos: number) => {
+      if (allowed.has(node.type.name)) {
+        results.push({ node, pos })
+      }
+    })
+    return results
+  }
+
+  if (selection instanceof NodeSelection) {
+    const { node, from: pos } = selection
+    if (node && allowed.has(node.type.name)) {
+      results.push({ node, pos })
+    }
+    return results
+  }
+
+  const { $anchor } = selection
+  const cell = cellAround($anchor)
+
+  if (cell) {
+    const cellNode = selection.$anchor.doc.nodeAt(cell.pos)
+    if (cellNode && allowed.has(cellNode.type.name)) {
+      results.push({ node: cellNode, pos: cell.pos })
+      return results
+    }
+  }
+
+  // Fallback: find parent nodes of allowed types
+  const parentNode = findParentNodeClosestToPos($anchor, (node) =>
+    allowed.has(node.type.name)
+  )
+
+  if (parentNode) {
+    results.push({ node: parentNode.node, pos: parentNode.pos })
+  }
+
+  return results
 }

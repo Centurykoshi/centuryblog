@@ -1,0 +1,59 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Asia/Kolkata
+X-LIC-LOCATION:Asia/Kolkata
+BEGIN:STANDARD
+TZOFFSETFROM:+0530
+TZOFFSETTO:+0530
+TZNAME:GMT+5:30
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Asia/Kolkata:20251106T160000
+DTEND;TZID=Asia/Kolkata:20251106T170000
+DTSTAMP:20251105T170944Z
+ORGANIZER;CN=Tech Recruitment Calendar:mailto:c_lr0vv8f8i3rncgl0ouagdsf0r0@
+ group.calendar.google.com
+UID:tvhs0q2muv5jegsljo0h9i3vqo@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=Amit Kumar;X-NUM-GUESTS=0:mailto:amit.kumar@mckinleyrice.co
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=director.placement@srmu.ac.in;X-NUM-GUESTS=0:mailto:director.placem
+ ent@srmu.ac.in
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Tech Recruitment Calendar;X-NUM-GUESTS=0:mailto:c_lr0vv8f8i3rncgl0ouagd
+ sf0r0@group.calendar.google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=Gaurav Bisht;X-NUM-GUESTS=0:mailto:gaurav.bisht@mckinleyrice.co
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=koshijeager@gmail.com;X-NUM-GUESTS=0:mailto:koshijeager@gmail.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/cuv-wvea-afc
+X-MICROSOFT-CDO-OWNERAPPTID:1055649323
+CREATED:20251105T170940Z
+DESCRIPTION:Congratulations on being shortlisted with McKinley Rice!\nInter
+ view Instruction: Please make sure that you join the call using a laptop wi
+ th a stable internet and you have distraction free environment.\nWe wish yo
+ u all the best for the interview! \nhttps://docs.google.com/document/d/1hhj
+ jg79u-u58kEpJv5p5YiimmBgM26UM/edit\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Google Meet: 
+ https://meet.google.com/cuv-wvea-afc\nOr dial: (US) +1 786-701-4181 PIN: 69
+ 0275617#\nMore phone numbers: https://tel.meet/cuv-wvea-afc?pin=10346783697
+ 34&hs=7\n\nLearn more about Meet at: https://support.google.com/a/users/ans
+ wer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20251105T170944Z
+LOCATION:https://meet.google.com/cuv-wvea-afc
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:McKinley Rice | Expertise Round | Mern Stack Intern
+TRANSP:OPAQUE
+ATTACH;FILENAME=McKinley Rice | Expertise Round | Mern Stack Intern;FMTTYPE
+ =application/vnd.google-apps.presentation:https://drive.google.com/file/d/1
+ 53GCQUMnNX-2vijMSjv4ztxVL9aFct2N/view?usp=drive_link
+END:VEVENT
+END:VCALENDAR
