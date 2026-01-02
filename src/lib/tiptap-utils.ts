@@ -430,6 +430,40 @@ export const handleImageUpload = async (
   }
 }
 
+/**
+ * Deletes an uploaded image from the server
+ * @param imageUrl - The URL of the image to delete
+ * @returns Promise resolving when deletion is complete
+ */
+export async function handleImageDelete(imageUrl: string): Promise<void> {
+  try {
+    // Extract filename from URL (e.g., "/uploads/images/123-file.jpg" -> "123-file.jpg")
+    const fileName = imageUrl.split('/').pop()
+
+    if (!fileName) {
+      throw new Error('Invalid image URL')
+    }
+
+    console.log('🗑️ Deleting image:', fileName)
+
+    const response = await fetch(`/api/upload-image?fileName=${fileName}`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Delete failed')
+    }
+
+    const data = await response.json()
+    console.log('✅ Image deleted successfully:', fileName)
+
+  } catch (error) {
+    console.error('❌ Image delete failed:', error)
+    // Don't throw error - allow UI deletion to proceed even if server delete fails
+  }
+}
+
 type ProtocolOptions = {
   /**
    * The protocol scheme to be registered.

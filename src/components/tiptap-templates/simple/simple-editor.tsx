@@ -5,7 +5,7 @@ import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
-import { Image } from "@tiptap/extension-image"
+import { ImageWithDeleteExtension } from "@/components/tiptap-node/image-with-delete"
 import { TaskItem, TaskList } from "@tiptap/extension-list"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Typography } from "@tiptap/extension-typography"
@@ -31,6 +31,7 @@ import "@/components/tiptap-node/code-block-node/code-block-node.scss"
 import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
 import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/image-node/image-node.scss"
+import "@/components/tiptap-node/image-with-delete/image-with-delete.scss"
 import "@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
@@ -68,7 +69,7 @@ import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
 
 // --- Lib ---
-import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
+import { handleImageUpload, handleImageDelete, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
@@ -215,12 +216,13 @@ export function SimpleEditor() {
       TaskList,
       TaskItem.configure({ nested: true }),
       Highlight.configure({ multicolor: true }),
-      Image,
+      ImageWithDeleteExtension,
       Typography,
       Superscript,
       Subscript,
       Selection,
       ImageUploadNode.configure({
+        type: "imageWithDelete",
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
         limit: 10,
@@ -250,8 +252,8 @@ export function SimpleEditor() {
           style={{
             ...(isMobile
               ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
+                bottom: `calc(100% - ${height - rect.y}px)`,
+              }
               : {}),
           }}
         >

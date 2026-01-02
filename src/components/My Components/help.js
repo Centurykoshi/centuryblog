@@ -1,102 +1,107 @@
+import { writeFile, mkdir, unlink } from "fs/promises";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import { existsSync } from 'fs';
+import path from "path";
+import { existsSync } from "fs";
 
 export async function POST(request: Request) {
     try {
-        console.log('📸 Image upload endpoint called');
-        
         const formdata = await request.formData();
         const file = formdata.get("file") as File;
 
         if (!file) {
-            console.log("❌ No file uploaded");
-            return NextResponse.json({ 
-                success: false, 
-                message: "No file uploaded" 
-            }, { status: 400 });
+            console.log("No file uploaded");
+            return NextResponse.json({ success: false, message: "No file uploaded" }, { status: 400 });
+
         }
 
         if (!file.type.startsWith("image/")) {
-            console.log("❌ Invalid file type:", file.type);
-            return NextResponse.json({ 
-                success: false, 
-                message: "Invalid file type. Only images are allowed." 
-            }, { status: 400 });
+            return NextResponse.json({ success: false, message: "Invalid file type. Only images are allowed." }, { status: 400 });
+
         }
 
-        // Validate file size (10MB limit)
-        const maxSize = 10 * 1024 * 1024; // 10MB
-        if (file.size > maxSize) {
-            console.log("❌ File too large:", file.size);
-            return NextResponse.json({
-                success: false,
-                message: "File too large. Maximum size is 10MB"
-            }, { status: 400 });
-        }
-
-        console.log('📁 File details:', {
+        console.log("File Details : ", {
             name: file.name,
             size: file.size,
             type: file.type
-        });
+        })
 
-        // Convert file to buffer
+        // Here we are converting the file to a buffer means binary data as all the files are stored in binary format so here image to binary and storing in bytes and converting buffer to nodejs buffer
+
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Create unique filename
         const timestamp = Date.now();
-        const randomString = Math.random().toString(36).substring(2, 15);
-        const fileExtension = path.extname(file.name);
-        const filename = `${timestamp}-${randomString}${fileExtension}`;
+        const fileName = `${timestamp}-${file.name}`;
+        const randomstring = Math.random().toString(36).substring(2, 8);
+        // here we are just giving it address so it can use it, we are not uploading the file here
 
-        // Define upload directory
-        const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'images');
+
+        const uploadsDir = path.join(process.cwd(), "public", "uploads", "images");
+
+        //eg : /home/piyush/my-next-app/public/uploads/images/17045592123-abcd123.png
+        const filePath = path.join(uploadsDir, fileName);
+
+        await writeFile(filePath, buffer);
+
+        const fileUrl = `/uploads/images/${fileName}`;
+
+        return NextResponse.json({
+            success: true,
+            url: fileUrl,
+            fileName: fileName,
+            size: file.size,
+            type: file.type,
+            message: "File uploaded successfully",
+        }, {
+            status: 200
+        }); 
+
+    } catch(error){ 
+        console.error("Error uploading file:", error);
+        return NextResponse.json({ success: false, message: "Error uploading file" }, { status: 500 });
+    }
+    
+
+}
+
+export async function DELETE(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const fileName = searchParams.get('fileName');
         
-        // Create directory if it doesn't exist
-        if (!existsSync(uploadsDir)) {
-            await mkdir(uploadsDir, { recursive: true });
-            console.log('📁 Created uploads directory:', uploadsDir);
+        if (!fileName) {
+            return NextResponse.json({ 
+                success: false, 
+                message: "Filename required" 
+            }, { status: 400 });
         }
 
-        // Save file
-        const filePath = path.join(uploadsDir, filename);
-        await writeFile(filePath, buffer);
+        // Construct file path
+        const filePath = path.join(process.cwd(), "public", "uploads", "images", fileName);
         
-        console.log('✅ File saved successfully:', filePath);
+        // Check if file exists
+        if (!existsSync(filePath)) {
+            return NextResponse.json({ 
+                success: false, 
+                message: "File not found" 
+            }, { status: 404 });
+        }
 
-        // Return public URL
-        const publicUrl = `/uploads/images/${filename}`;
+        // Delete the file
+        await unlink(filePath);
+        
+        console.log(`File deleted: ${fileName}`);
         
         return NextResponse.json({
             success: true,
-            url: publicUrl,
-            filename: filename,
-            size: file.size,
-            type: file.type,
-            message: "Image uploaded successfully"
-        }, { status: 200 });
-
+            message: "File deleted successfully"
+        });
+        
     } catch (error) {
-        console.error('❌ Upload error:', error);
-        return NextResponse.json({
-            success: false,
-            message: "Internal server error",
-            error: error instanceof Error ? error.message : "Unknown error"
+        console.error("Error deleting file:", error);
+        return NextResponse.json({ 
+            success: false, 
+            message: "Error deleting file" 
         }, { status: 500 });
     }
-}
-
-// Handle OPTIONS for CORS
-export async function OPTIONS() {
-    return new NextResponse(null, {
-        status: 200,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-        },
-    });
 }
