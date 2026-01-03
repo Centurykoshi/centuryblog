@@ -1,7 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
+import { useParams } from "next/navigation"
+import { useTRPC } from "@/trpc/client"
+import { extractFirstHeading, Extractfirstimage } from "@/utils/extract-title-image"
+import { useMutation, useQuery } from "@tanstack/react-query"
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
@@ -59,6 +63,7 @@ import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
 import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon"
 import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
 import { LinkIcon } from "@/components/tiptap-icons/link-icon"
+import { Save, Clock } from "lucide-react"
 
 // --- Hooks ---
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
@@ -80,10 +85,14 @@ const MainToolbarContent = ({
   onHighlighterClick,
   onLinkClick,
   isMobile,
+  onSave,
+  saveStatus,
 }: {
   onHighlighterClick: () => void
   onLinkClick: () => void
   isMobile: boolean
+  onSave: () => void
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error'
 }) => {
   return (
     <>
@@ -144,6 +153,30 @@ const MainToolbarContent = ({
         <ImageUploadButton text="Add" />
       </ToolbarGroup>
 
+      <ToolbarSeparator />
+
+      <ToolbarGroup>
+        <Button
+          data-style="ghost"
+          onClick={onSave}
+          disabled={saveStatus === 'saving'}
+          title={saveStatus === 'saved' ? 'Saved' : saveStatus === 'saving' ? 'Saving...' : 'Save'}
+        >
+          {saveStatus === 'saving' ? (
+            <Clock className="tiptap-button-icon animate-spin" />
+          ) : (
+            <Save className="tiptap-button-icon" />
+          )}
+          {!isMobile && (
+            <span className="ml-1">
+              {saveStatus === 'saved' ? 'Saved' :
+                saveStatus === 'saving' ? 'Saving...' :
+                  saveStatus === 'error' ? 'Error' : 'Save'}
+            </span>
+          )}
+        </Button>
+      </ToolbarGroup>
+
       <Spacer />
 
       {isMobile && <ToolbarSeparator />}
@@ -191,7 +224,15 @@ export function SimpleEditor() {
     "main"
   )
   const toolbarRef = useRef<HTMLDivElement>(null)
+  const params = useParams()
+  const slug = params?.slug as string
 
+  // Save states
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [lastSavedContent, setLastSavedContent] = useState<string>('')
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout>()
+
+  // Initialize editor first
   const editor = useEditor({
     immediatelyRender: false,
     editorProps: {
@@ -233,6 +274,96 @@ export function SimpleEditor() {
     content,
   })
 
+  // tRPC client
+  const trpc = useTRPC()
+
+  // Mutations and queries
+  const updateDocumentMutation = useMutation(trpc.creating_page.updateDocument.mutationOptions({
+    onSuccess: () => {
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 2000)
+    },
+    onError: (error) => {
+      setSaveStatus('error')
+      console.error('Save failed:', error)
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    },
+  }))
+
+  // Load document content query
+  const { data: documentData } = useQuery(
+    trpc.creating_page.getDocument.queryOptions(
+      { slug },
+      { enabled: !!slug }
+    )
+  )
+
+  // Load content into editor when data is available
+  useEffect(() => {
+    if (documentData?.document?.contentJSON && editor) {
+      try {
+        const content = JSON.parse(documentData.document.contentJSON)
+        editor.commands.setContent(content)
+        setLastSavedContent(documentData.document.contentJSON)
+      } catch (error) {
+        console.error('Failed to parse document content:', error)
+      }
+    }
+  }, [documentData, editor])
+
+  // Auto-save logic
+  const scheduleAutoSave = useCallback(() => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current)
+    }
+
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      if (editor && slug) {
+        const currentContent = JSON.stringify(editor.getJSON())
+        if (currentContent !== lastSavedContent) {
+          saveDocument()
+        }
+      }
+    }, 60000) // Auto-save every 1 minute
+  }, [editor, slug, lastSavedContent]) // Remove saveDocument from deps to avoid circular dependency
+
+  // Save function
+  const saveDocument = useCallback(async () => {
+    if (!editor || !slug || saveStatus === 'saving') return
+
+    setSaveStatus('saving')
+
+    const contentJSON = JSON.stringify(editor.getJSON())
+    const contentHTML = editor.getHTML()
+    const firstHeading = extractFirstHeading(editor)
+    const firstImage = Extractfirstimage(editor)
+
+    try {
+      await updateDocumentMutation.mutateAsync({
+        slug,
+        title: firstHeading || "Untitled",
+        contentJSON,
+        contentHTML,
+        featuredImg: firstImage || undefined,
+      })
+      setLastSavedContent(contentJSON)
+    } catch (error) {
+      console.error('Save failed:', error)
+    }
+  }, [editor, slug, updateDocumentMutation, saveStatus])
+
+  // Add onUpdate to editor after initialization
+  useEffect(() => {
+    if (editor) {
+      const handleUpdate = () => {
+        scheduleAutoSave()
+      }
+
+      editor.on('update', handleUpdate)
+      return () => editor.off('update', handleUpdate)
+    }
+  }, [editor, scheduleAutoSave])
+
   const rect = useCursorVisibility({
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
@@ -243,6 +374,28 @@ export function SimpleEditor() {
       setMobileView("main")
     }
   }, [isMobile, mobileView])
+
+  // Cleanup auto-save timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Keyboard shortcut for manual save (Ctrl+S / Cmd+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        saveDocument()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [saveDocument])
 
   return (
     <div className="simple-editor-wrapper">
@@ -262,6 +415,8 @@ export function SimpleEditor() {
               onHighlighterClick={() => setMobileView("highlighter")}
               onLinkClick={() => setMobileView("link")}
               isMobile={isMobile}
+              onSave={saveDocument}
+              saveStatus={saveStatus}
             />
           ) : (
             <MobileToolbarContent
