@@ -294,20 +294,42 @@ export function SimpleEditor() {
   // tRPC client
   const trpc = useTRPC()
 
-  // Mutations and queries
-  const updateDocumentMutation = useMutation(
-    trpc.creating_page.updateDocument.mutationOptions({
-      onSuccess: () => {
-        setSaveStatus('saved')
-        setTimeout(() => setSaveStatus('idle'), 2000)
-      },
-      onError: (error) => {
-        setSaveStatus('error')
-        console.error('Save failed:', error)
-        setTimeout(() => setSaveStatus('idle'), 3000)
-      },
-    })
-  )
+  const updateDocumentMutation = useMutation(trpc.creating_page.updateDocument.mutationOptions({}));
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout> | undefined;
+
+    if (updateDocumentMutation.isSuccess) {
+      setSaveStatus("saved");
+      t = setTimeout(() => setSaveStatus("idle"), 2000);
+    } else if (updateDocumentMutation.isError) {
+      setSaveStatus("error");
+      t = setTimeout(() => setSaveStatus("idle"), 2000);
+    }
+
+    return () => {
+      if (t) clearTimeout(t);
+    };
+  }, [
+    updateDocumentMutation.isSuccess,
+    updateDocumentMutation.isError,
+  ]);
+
+
+  // // Mutations and queries
+  // const updateDocumentMutation = useMutation(
+  //   trpc.creating_page.updateDocument.mutationOptions({
+  //     onSuccess: () => {
+  //       setSaveStatus('saved')
+  //       setTimeout(() => setSaveStatus('idle'), 2000)
+  //     },
+  //     onError: (error) => {
+  //       setSaveStatus('error')
+  //       console.error('Save failed:', error)
+  //       setTimeout(() => setSaveStatus('idle'), 3000)
+  //     },
+  //   })
+  // )
 
   // Load document content query
   const { data: documentData } = useQuery(
