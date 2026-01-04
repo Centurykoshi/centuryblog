@@ -16,7 +16,7 @@ import { Typography } from "@tiptap/extension-typography"
 import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
-import { Selection } from "@tiptap/extensions"
+import { Placeholder } from "@tiptap/extension-placeholder"
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -106,7 +106,7 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={isMobile} />
+        <HeadingDropdownMenu levels={[2, 3, 4]} portal={isMobile} />
         <ListDropdownMenu
           types={["bulletList", "orderedList", "taskList"]}
           portal={isMobile}
@@ -174,6 +174,12 @@ const MainToolbarContent = ({
                   saveStatus === 'error' ? 'Error' : 'Save'}
             </span>
           )}
+          {saveStatus === 'saved' && (
+            <div className="w-2 h-2 bg-green-500 rounded-full ml-1" />
+          )}
+          {saveStatus === 'error' && (
+            <div className="w-2 h-2 bg-red-500 rounded-full ml-1" />
+          )}
         </Button>
       </ToolbarGroup>
 
@@ -230,7 +236,12 @@ export function SimpleEditor() {
   // Save states
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [lastSavedContent, setLastSavedContent] = useState<string>('')
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout>()
+  const [title, setTitle] = useState<string>('')
+  const [featuredImage, setFeaturedImage] = useState<string>('')
+  const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 }) // x,y as percentages
+  const [isRepositioning, setIsRepositioning] = useState<boolean>(false)
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false)
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Initialize editor first
   const editor = useEditor({
@@ -247,6 +258,9 @@ export function SimpleEditor() {
     extensions: [
       StarterKit.configure({
         horizontalRule: false,
+        heading: {
+          levels: [2, 3, 4], // Only allow h2, h3, h4 since h1 is the title
+        },
         link: {
           openOnClick: false,
           enableClickSelection: true,
@@ -261,7 +275,10 @@ export function SimpleEditor() {
       Typography,
       Superscript,
       Subscript,
-      Selection,
+      Placeholder.configure({
+        placeholder: "Start writing your article content here...",
+        emptyNodeClass: "is-empty",
+      }),
       ImageUploadNode.configure({
         type: "imageWithDelete",
         accept: "image/*",
@@ -278,17 +295,19 @@ export function SimpleEditor() {
   const trpc = useTRPC()
 
   // Mutations and queries
-  const updateDocumentMutation = useMutation(trpc.creating_page.updateDocument.mutationOptions({
-    onSuccess: () => {
-      setSaveStatus('saved')
-      setTimeout(() => setSaveStatus('idle'), 2000)
-    },
-    onError: (error) => {
-      setSaveStatus('error')
-      console.error('Save failed:', error)
-      setTimeout(() => setSaveStatus('idle'), 3000)
-    },
-  }))
+  const updateDocumentMutation = useMutation(
+    trpc.creating_page.updateDocument.mutationOptions({
+      onSuccess: () => {
+        setSaveStatus('saved')
+        setTimeout(() => setSaveStatus('idle'), 2000)
+      },
+      onError: (error) => {
+        setSaveStatus('error')
+        console.error('Save failed:', error)
+        setTimeout(() => setSaveStatus('idle'), 3000)
+      },
+    })
+  )
 
   // Load document content query
   const { data: documentData } = useQuery(
@@ -300,69 +319,116 @@ export function SimpleEditor() {
 
   // Load content into editor when data is available
   useEffect(() => {
-    if (documentData?.document?.contentJSON && editor) {
+    if (documentData?.document && editor) {
       try {
-        const content = JSON.parse(documentData.document.contentJSON)
-        editor.commands.setContent(content)
-        setLastSavedContent(documentData.document.contentJSON)
+        // Load title
+        if (documentData.document.title) {
+          setTitle(documentData.document.title)
+        }
+
+        // Load featured image
+        if (documentData.document.featuredImg) {
+          setFeaturedImage(documentData.document.featuredImg)
+        }
+
+        // Load content
+        if (documentData?.document.contentJSON) {
+          const contentString = String(documentData.document.contentJSON)
+          const content = JSON.parse(contentString)
+          editor.commands.setContent(content)
+          setLastSavedContent(contentString)
+        }
       } catch (error) {
         console.error('Failed to parse document content:', error)
       }
     }
   }, [documentData, editor])
 
-  // Auto-save logic
+  // Auto-save logic - save 3 seconds after content changes
   const scheduleAutoSave = useCallback(() => {
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current)
+      autoSaveTimeoutRef.current = null
     }
 
     autoSaveTimeoutRef.current = setTimeout(() => {
       if (editor && slug) {
         const currentContent = JSON.stringify(editor.getJSON())
-        if (currentContent !== lastSavedContent) {
-          saveDocument()
+        const currentState = JSON.stringify({ content: currentContent, title, featuredImage, imagePosition })
+        const lastState = JSON.stringify({ content: lastSavedContent, title: documentData?.document?.title || '', featuredImage: documentData?.document?.featuredImg || '', imagePosition: { x: 50, y: 50 } })
+
+        if (currentState !== lastState && saveStatus === 'idle') {
+          requestAnimationFrame(() => {
+            saveDocument()
+          })
         }
       }
-    }, 60000) // Auto-save every 1 minute
-  }, [editor, slug, lastSavedContent]) // Remove saveDocument from deps to avoid circular dependency
+    }, 3000)
+  }, [editor, slug, title, featuredImage]) // Include title and featuredImage in deps
 
   // Save function
   const saveDocument = useCallback(async () => {
-    if (!editor || !slug || saveStatus === 'saving') return
+    if (!editor || !slug) return
+
+    // Check status again inside the function to avoid dependency issues
+    if (saveStatus === 'saving') return
 
     setSaveStatus('saving')
 
-    const contentJSON = JSON.stringify(editor.getJSON())
-    const contentHTML = editor.getHTML()
-    const firstHeading = extractFirstHeading(editor)
-    const firstImage = Extractfirstimage(editor)
-
     try {
+      const contentJSON = JSON.stringify(editor.getJSON())
+      const contentHTML = editor.getHTML()
+      // Use the dedicated title state instead of extracting from content
+      const documentTitle = title.trim() || "Untitled"
+
       await updateDocumentMutation.mutateAsync({
         slug,
-        title: firstHeading || "Untitled",
+        title: documentTitle,
         contentJSON,
         contentHTML,
-        featuredImg: firstImage || undefined,
+        featuredImg: featuredImage || undefined,
       })
       setLastSavedContent(contentJSON)
     } catch (error) {
       console.error('Save failed:', error)
     }
-  }, [editor, slug, updateDocumentMutation, saveStatus])
+  }, [editor, slug, updateDocumentMutation, title, featuredImage])
 
   // Add onUpdate to editor after initialization
   useEffect(() => {
-    if (editor) {
-      const handleUpdate = () => {
-        scheduleAutoSave()
-      }
+    if (!editor) return
 
-      editor.on('update', handleUpdate)
-      return () => editor.off('update', handleUpdate)
+    const handleUpdate = () => {
+      // Use requestAnimationFrame to prevent flushSync issues
+      requestAnimationFrame(() => {
+        scheduleAutoSave()
+      })
+    }
+
+    editor.on('update', handleUpdate)
+    return () => {
+      editor.off('update', handleUpdate)
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+        autoSaveTimeoutRef.current = null
+      }
     }
   }, [editor, scheduleAutoSave])
+
+  // Auto-save when title changes
+  useEffect(() => {
+    scheduleAutoSave()
+  }, [title, scheduleAutoSave])
+
+  // Auto-save when featured image changes
+  useEffect(() => {
+    scheduleAutoSave()
+  }, [featuredImage, scheduleAutoSave])
+
+  // Auto-save when image position changes
+  useEffect(() => {
+    scheduleAutoSave()
+  }, [imagePosition, scheduleAutoSave])
 
   const rect = useCursorVisibility({
     editor,
@@ -384,12 +450,20 @@ export function SimpleEditor() {
     }
   }, [])
 
-  // Keyboard shortcut for manual save (Ctrl+S / Cmd+S)
+  // Keyboard shortcut for manual save (Ctrl+S / Cmd+S) - forces immediate save
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
-        saveDocument()
+        // Cancel any pending auto-save and save immediately
+        if (autoSaveTimeoutRef.current) {
+          clearTimeout(autoSaveTimeoutRef.current)
+          autoSaveTimeoutRef.current = null
+        }
+        // Use requestAnimationFrame to prevent flushSync issues
+        requestAnimationFrame(() => {
+          saveDocument()
+        })
       }
     }
 
@@ -400,6 +474,168 @@ export function SimpleEditor() {
   return (
     <div className="simple-editor-wrapper">
       <EditorContext.Provider value={{ editor }}>
+        {/* Title Section */}
+        <div className="simple-editor-header">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter your article title..."
+            className="simple-editor-title-input"
+            maxLength={200}
+          />
+        </div>
+
+        {/* Featured Image Section */}
+        <div className="simple-editor-featured-image">
+          {featuredImage ? (
+            <div className="featured-image-container">
+              <div className="featured-image-wrapper">
+                <img
+                  src={featuredImage}
+                  alt="Featured image"
+                  className="featured-image-preview"
+                  style={{
+                    objectPosition: `${imagePosition.x}% ${imagePosition.y}%`
+                  }}
+                />
+
+                {/* Remove Button (Top Right) */}
+                <button
+                  onClick={() => setFeaturedImage('')}
+                  className="featured-image-remove"
+                  title="Remove featured image"
+                >
+                  ✕
+                </button>
+
+                {/* Reposition Toggle (Bottom Right) */}
+                <button
+                  onClick={() => setIsRepositioning(!isRepositioning)}
+                  className={`reposition-toggle ${isRepositioning ? 'active' : ''}`}
+                  title="Adjust image position"
+                >
+                  <svg fill="currentColor" viewBox="0 0 20 20" className="reposition-icon">
+                    <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm12 12V6H4v8h12z" clipRule="evenodd" />
+                  </svg>
+                </button>
+
+                {/* Compact Reposition Controls */}
+                {isRepositioning && (
+                  <div className="compact-controls">
+                    <div className="compact-control">
+                      <span>H:</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={imagePosition.x}
+                        onChange={(e) => setImagePosition(prev => ({ ...prev, x: parseInt(e.target.value) }))}
+                        className="compact-slider"
+                      />
+                      <span>{imagePosition.x}%</span>
+                    </div>
+
+                    <div className="compact-control">
+                      <span>V:</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={imagePosition.y}
+                        onChange={(e) => setImagePosition(prev => ({ ...prev, y: parseInt(e.target.value) }))}
+                        className="compact-slider"
+                      />
+                      <span>{imagePosition.y}%</span>
+                    </div>
+
+                    <div className="compact-presets">
+                      <button
+                        onClick={() => setImagePosition({ x: 50, y: 50 })}
+                        className="compact-preset"
+                        title="Center"
+                      >
+                        ●
+                      </button>
+                      <button
+                        onClick={() => setImagePosition({ x: 50, y: 25 })}
+                        className="compact-preset"
+                        title="Top"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        onClick={() => setImagePosition({ x: 50, y: 75 })}
+                        className="compact-preset"
+                        title="Bottom"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="featured-image-placeholder">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    setIsUploadingImage(true)
+                    try {
+                      // Upload directly to API
+                      const formData = new FormData()
+                      formData.append('file', file)
+
+                      const response = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        body: formData,
+                      })
+
+                      const result = await response.json()
+
+                      if (result.success && result.url) {
+                        setFeaturedImage(result.url)
+                      } else {
+                        console.error('Upload failed:', result.message)
+                        alert('Failed to upload image: ' + result.message)
+                      }
+                    } catch (error) {
+                      console.error('Failed to upload featured image:', error)
+                      alert('Failed to upload image. Please try again.')
+                    } finally {
+                      setIsUploadingImage(false)
+                    }
+                  }
+                }}
+                className="featured-image-input"
+                id="featured-image-upload"
+              />
+              <label htmlFor="featured-image-upload" className="featured-image-label">
+                {isUploadingImage ? (
+                  <>
+                    <div className="featured-image-icon">
+                      <Clock className="animate-spin w-8 h-8" />
+                    </div>
+                    <div className="featured-image-text">Uploading...</div>
+                    <div className="featured-image-subtext">Please wait while your image is being uploaded</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="featured-image-icon">📷</div>
+                    <div className="featured-image-text">Add Featured Image</div>
+                    <div className="featured-image-subtext">Click to upload cover image for your article</div>
+                  </>
+                )}
+              </label>
+            </div>
+          )}
+        </div>
+
+        {/* Toolbar */}
         <Toolbar
           ref={toolbarRef}
           style={{
@@ -426,11 +662,15 @@ export function SimpleEditor() {
           )}
         </Toolbar>
 
-        <EditorContent
-          editor={editor}
-          role="presentation"
-          className="simple-editor-content"
-        />
+        {/* Content Editor */}
+        <div className="simple-editor-content-wrapper">
+          <EditorContent
+            editor={editor}
+            role="presentation"
+            className="simple-editor-content"
+            placeholder="Start writing your article content here..."
+          />
+        </div>
       </EditorContext.Provider>
     </div>
   )
