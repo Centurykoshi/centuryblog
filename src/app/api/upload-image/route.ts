@@ -38,6 +38,11 @@ export async function POST(request: Request) {
 
         const uploadsDir = path.join(process.cwd(), "public", "uploads", "images");
 
+        // Ensure the uploads directory exists
+        if (!existsSync(uploadsDir)) {
+            await mkdir(uploadsDir, { recursive: true });
+        }
+
         //eg : /home/piyush/my-next-app/public/uploads/images/17045592123-abcd123.png
         const filePath = path.join(uploadsDir, fileName);
 
@@ -68,7 +73,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
     try {
         const { searchParams } = new URL(request.url); // this lets the server know which file to delete by destructring the whole the link when user clicks on the item 
-        
+
         const fileName = searchParams.get("fileName");
         // so basically we are getting thte name of the file here "sfdsafawesfsafas.png"
 
