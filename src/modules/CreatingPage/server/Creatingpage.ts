@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
+import { title } from "process";
 import z from "zod";
 
 function generateSlug(title: string): string {
@@ -15,7 +16,7 @@ export const CreatingPage = createTRPCRouter({
             z.object({
                 title: z.string("Untitled Page"),
                 contentJSON: z.string().optional(),
-                slug: z.string().optional(),
+                slug: z.string().optional(), 
                 featuredImg: z.string().optional(),
             })
         )
@@ -98,7 +99,7 @@ export const CreatingPage = createTRPCRouter({
     updateDocument: baseProcedure
         .input(
             z.object({
-                slug: z.string(),
+                slug: z.string() , 
                 title: z.string().optional(),
                 contentJSON: z.string().optional(),
                 contentHTML: z.string().optional(),

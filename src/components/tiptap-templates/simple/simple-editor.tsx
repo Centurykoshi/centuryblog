@@ -296,8 +296,15 @@ export function SimpleEditor() {
 
   const updateDocumentMutation = useMutation(trpc.creating_page.updateDocument.mutationOptions({}));
 
+  // we are not writing anything inside the mutation option beacuse it goes into infitie intatlization so in order to fix the problem and things
+  //  work we are using useeffect hock which will be more benefiicial for us and it will remove the problem 
+
   useEffect(() => {
     let t: ReturnType<typeof setTimeout> | undefined;
+
+    // here we are defining the type of t as it can recieve either ther timeout value or undefined. WHY WE ARE USING UNDEFINED CAN'T WE JUST LEAVE IT? 
+
+    // we can't just leave it or put null or something else beacuse we are telling typescript that it can be undefined because right now it doesn't consist any value and it will be undefined when nohting is happening 
 
     if (updateDocumentMutation.isSuccess) {
       setSaveStatus("saved");
@@ -337,7 +344,9 @@ export function SimpleEditor() {
       { slug },
       { enabled: !!slug }
     )
-  )
+  );
+
+  //enabled tells react query when to run something  so here when slug is undefined it won't run but when it is defined it will run 
 
   // Load content into editor when data is available
   useEffect(() => {
@@ -345,7 +354,7 @@ export function SimpleEditor() {
       try {
         // Load title
         if (documentData.document.title) {
-          setTitle(documentData.document.title)
+          setTitle(documentData.document.title);
         }
 
         // Load featured image
@@ -353,9 +362,11 @@ export function SimpleEditor() {
           setFeaturedImage(documentData.document.featuredImg)
         }
 
+        const querydata = documentData?.document.contentJSON; 
+
         // Load content
-        if (documentData?.document.contentJSON) {
-          const contentString = String(documentData.document.contentJSON)
+        if (querydata) {
+          const contentString = String(documentData.document.contentJSON); 
           const content = JSON.parse(contentString)
           editor.commands.setContent(content)
           setLastSavedContent(contentString)
@@ -401,7 +412,8 @@ export function SimpleEditor() {
       const contentJSON = JSON.stringify(editor.getJSON())
       const contentHTML = editor.getHTML()
       // Use the dedicated title state instead of extracting from content
-      const documentTitle = title.trim() || "Untitled"
+      const documentTitle = title.trim() || undefined;
+      
 
       await updateDocumentMutation.mutateAsync({
         slug,
