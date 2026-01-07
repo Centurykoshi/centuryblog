@@ -1,62 +1,151 @@
+"use client";
 
-import { Card } from "@/components/ui/card";
-import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
-import { Edit, NotebookTabsIcon, PackageIcon } from "lucide-react";
+import { useTRPC } from "@/trpc/client";
+import { useMutation } from "@tanstack/react-query";
+import { Edit, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import DropPublishDraft from "../Posts Components/DropDownP";
+import { Button } from "@/components/ui/button";
 
 
+type Posts = {
+    id: string;
+    title: string;
+    slug: string;
+    status: "DRAFT" | "PUBLISHED" | "UNPUBLISH";
+}
+
+export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
+
+    const [posts, setPosts] = useState(initialPosts);
+    const [pendingChanges, setPendingChanges] = useState<Record<string, "DRAFT" | "PUBLISHED" | "UNPUBLISH">>({});
+
+    const trpc = useTRPC();
+
+    const UpdateDocumentSatus = useMutation(trpc.creating_page.updateDocument.mutationOptions({
+    }));
 
 
-export default async function AllPosts() {
-
-    const posts = await prisma.document.findMany({
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-            status: true,
+    useEffect(() => {
+        if (UpdateDocumentSatus.isSuccess) {
+            toast.success("Updated Successfully");
         }
-    })
+        if (UpdateDocumentSatus.isError) {
+            toast.error("Failed to update the status");
+        }
+    }, [UpdateDocumentSatus.isSuccess, UpdateDocumentSatus.isError]);
+
+
+
+    const handleStatusChange = (postId: string, newStatus: "DRAFT" | "PUBLISHED" | "UNPUBLISH") => {
+        setPendingChanges(prev => ({ ...prev, [postId]: newStatus }));
+    };
+
+
+    const handlesave = async (post: Posts) => {
+        const pendingStatus = pendingChanges[post.id];
+        if (!pendingStatus) return;
+
+        try {
+            await UpdateDocumentSatus.mutateAsync({
+                slug: post.slug,
+                status: pendingStatus
+            });
+
+            setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: pendingStatus } : p));
+
+            setPendingChanges(prev => {
+                const { [post.id]: _, ...rest } = prev;
+                return rest;
+            });
+
+        } catch (error) {
+            console.error("Something went wrong");
+        }
+    }
+
+    const handleDelete = (postId: string) => {
+        // Add your delete logic here
+        console.log("Delete post:", postId);
+        toast.success("Post deleted");
+    }
+
+
     return (
         <div>
-            <div className="absolute top-20 left-1/5 ">
-
-
+            <div className="absolute top-20 left-1/5">
                 <div className="border-2 p-8 text-secondary/40 rounded-2xl">
-
-
-
                     <div className="w-[60vw]">
-                        <div className="grid grid-cols-4 gap-10 p-2 pb-10 pt-10 text-lg text-primary-foreground font-semibold border-b bg-secondary/29 rounded-s text-center">
+                        <div className="grid grid-cols-5 gap-6 p-2 pb-10 pt-10 text-lg text-primary-foreground font-semibold border-b bg-secondary/29 rounded-s text-center">
                             <div>Serial No</div>
                             <div>Post Title</div>
                             <div>Status</div>
+                            <div>Changes</div>
                             <div>Actions</div>
                         </div>
 
                         <div>
-                            {posts.map((post, index) => (
-                                <div key={post.id} className={cn("grid grid-cols-4 gap-10 p-6 text-lg text-primary text-shadow-m text-center border-b last:border-b-0")}>
-                                    <div className="text-secondary font-semibold">{index + 1}</div>
-                                    <div className="flex gap-2 justify-between"><span>{post.title} </span><Link href={`/dashboard/edit/${post.slug}`}> <Edit className="w-5 h-5 text-right m-1 hover:rotate-360 hover:text-secondary-foreground transition-all ease-in-out duration-700 cursor-pointer" /></Link> </div>
-                                    <div>{post.status}</div>
-                                    <div>{/* actions placeholder */}</div>
-                                </div>
-                            ))}
+                            {posts.map((post, index) => {
+                                const currentStatus = pendingChanges[post.id] || post.status;
+                                const hasChanges = pendingChanges[post.id] && pendingChanges[post.id] !== post.status;
+                                return (
+                                    <div key={post.id} className={cn("grid grid-cols-5 gap-6 p-6 text-lg text-primary text-shadow-m text-center border-b last:border-b-0 items-center")}>
+                                        <div className="text-secondary font-semibold">{index + 1}</div>
+                                        <div className="text-left">{post.title}</div>
+                                        <div>
+                                            <span className={cn("px-2 py-1 rounded-sm text-xs font-medium", 
+                                                post.status === "PUBLISHED" && "bg-secondary text-primary-foreground", 
+                                                post.status === "DRAFT" && "bg-primary-foreground/20 text-primary-foreground", 
+                                                post.status === "UNPUBLISH" && "bg-secondary/40 text-secondary-foreground"
+                                            )}>
+                                                {post.status}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <DropPublishDraft 
+                                                value={currentStatus} 
+                                                onchange={(newStatus) => handleStatusChange(post.id, newStatus)} 
+                                            />
+                                            {hasChanges && (
+                                                <div className="text-xs text-foreground/50 mt-1">
+                                                    → {pendingChanges[post.id]}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2 justify-center">
+                                            <Link href={`/dashboard/edit/${post.slug}`}>
+                                                <Button variant="outline" size="icon" className="w-8 h-8">
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
+                                            </Link>
+                                            <Button 
+                                                variant={hasChanges ? "default" : "outline"} 
+                                                size="icon"
+                                                className="w-8 h-8"
+                                                onClick={() => handlesave(post)} 
+                                                disabled={UpdateDocumentSatus.isPending || !hasChanges}
+                                            >
+                                                <Save className="w-4 h-4" />
+                                            </Button>
+                                            <Button 
+                                                variant="outline" 
+                                                size="icon"
+                                                className="w-8 h-8 hover:bg-destructive hover:text-destructive-foreground"
+                                                onClick={() => handleDelete(post.id)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
                     </div>
-
                 </div>
             </div>
-
-
         </div>
-
-
-
-
-
-
     )
 }
