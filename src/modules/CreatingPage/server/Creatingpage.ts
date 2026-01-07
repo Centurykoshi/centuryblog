@@ -16,7 +16,7 @@ export const CreatingPage = createTRPCRouter({
             z.object({
                 title: z.string("Untitled Page"),
                 contentJSON: z.string().optional(),
-                slug: z.string().optional(), 
+                slug: z.string().optional(),
                 featuredImg: z.string().optional(),
             })
         )
@@ -99,13 +99,13 @@ export const CreatingPage = createTRPCRouter({
     updateDocument: baseProcedure
         .input(
             z.object({
-                slug: z.string() , 
+                slug: z.string(),
                 title: z.string().optional(),
                 contentJSON: z.string().optional(),
                 contentHTML: z.string().optional(),
                 excerpt: z.string().optional(),
                 featuredImg: z.string().optional(),
-                status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).optional(),
+                status: z.enum(["DRAFT", "PUBLISHED", "UNPUBLISH"]).optional(),
             })
         )
         .mutation(async ({ input, ctx }) => {

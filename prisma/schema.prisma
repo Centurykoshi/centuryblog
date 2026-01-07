@@ -65,7 +65,7 @@ model Post {
 enum PostStatus {
   DRAFT
   PUBLISHED
-  ARCHIVED
+  UNPUBLISH
 }
 
 model Tag {
