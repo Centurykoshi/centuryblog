@@ -78,7 +78,7 @@ export const CreatingPage = createTRPCRouter({
             const document = await prisma.document.findFirst({
                 where: {
                     slug: input.slug,
-                    userId: userId,
+
                 },
             });
 
@@ -121,7 +121,7 @@ export const CreatingPage = createTRPCRouter({
             const existingDocument = await prisma.document.findFirst({
                 where: {
                     slug: input.slug,
-                    userId: userId,
+
                 }
             });
 
@@ -152,6 +152,48 @@ export const CreatingPage = createTRPCRouter({
                 document: updateDocument,
             };
         }),
+
+    deletepage: baseProcedure
+        .input(z.object({
+            slug: z.string()
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const userId = ctx.userId;
+
+            if (!userId) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "You must be logged in to delete a page "
+
+                });
+            }
+
+            const document = await prisma.document.findFirst({
+                where: {
+                    slug: input.slug,
+
+                }
+            });
+
+            if (!document) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Document not found get better and find it "
+                });
+            }
+
+            await prisma.document.delete({
+                where: { id: document.id }
+            });
+
+            return {
+                success: true,
+                message: "Page deleted successfully."
+            }
+        }),
+
+
+
 
 
 })

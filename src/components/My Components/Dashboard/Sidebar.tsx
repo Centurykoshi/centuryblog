@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SidebarContent, Sidebar, SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import Link from "next/link";
 import { AlignCenterHorizontal, BedIcon, Bell, Edit, Icon, LayoutDashboard, Mail, ChevronDown, FileText, Clock, Archive, AlignLeftIcon } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
@@ -20,10 +21,10 @@ export default function SidebarDashboard() {
     ]
 
     const subSidebar = [
-        { name: "All Posts", icon: AlignLeftIcon },
-        { name: "Drafts", icon: FileText },
-        { name: "Published", icon: Archive },
-        { name: "Scheduled", icon: Clock },
+        { name: "All Posts", icon: AlignLeftIcon , href : "/Posts"},
+        { name: "Drafts", icon: FileText , href : "/Posts" },
+        { name: "Published", icon: Archive , href : "/Posts" },
+        { name: "Scheduled", icon: Clock , href : "/Posts"},
     ]
     return (
         <div className="overflow-x-hidden">
@@ -45,6 +46,7 @@ export default function SidebarDashboard() {
                                             transition={{ duration: 0.2 }}
                                         >
                                             <CollapsibleTrigger asChild>
+                                            
                                                 <motion.div
                                                     className="flex items-center justify-between text-sm cursor-pointer text-secondary-foreground p-2 rounded-lg hover:text-foreground hover:bg-accent/50 transition-colors duration-200"
                                                     whileHover="hover"
@@ -79,6 +81,7 @@ export default function SidebarDashboard() {
                                                 </motion.div>
                                             </CollapsibleTrigger>
                                         </motion.div>
+                                        
 
                                         <CollapsibleContent asChild>
                                             <motion.div
@@ -105,7 +108,12 @@ export default function SidebarDashboard() {
                                                                     ease: "easeOut"
                                                                 }}
                                                             >
-                                                                <SidebarMenuButton asChild>
+                                                                <SidebarMenuButton asChild >
+
+                                                                    <Link href={sidebar.href}>
+                                                            
+                                        
+        
                                                                     <motion.div
                                                                         className="flex items-center cursor-pointer text-xs text-secondary-foreground p-2 rounded-lg hover:bg-accent/50 transition-colors duration-200"
                                                                         whileHover="hover"
@@ -140,6 +148,7 @@ export default function SidebarDashboard() {
                                                                             {sidebar.name}
                                                                         </motion.span>
                                                                     </motion.div>
+                                                                            </Link>
                                                                 </SidebarMenuButton>
                                                             </motion.div>
                                                         </SidebarMenuItem>
