@@ -2,10 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Edit, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import DropPublishDraft from "../Posts Components/DropDownP";
 import { Button } from "@/components/ui/button";
@@ -63,14 +63,40 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
             });
 
         } catch (error) {
-            console.error("Something went wrong");
+            console.error("Something went wrong" + error);
         }
     }
 
-    const handleDelete = (postId: string) => {
-        // Add your delete logic here
-        console.log("Delete post:", postId);
-        toast.success("Post deleted");
+    const queryClient = useQueryClient();
+
+    const deleteConversation = useMutation(trpc.creating_page.deletepage.mutationOptions({
+        onSuccess: (_,variables) => {
+
+              setPosts(prev => prev.filter(p => p.slug !== variables.slug));
+
+       
+
+            toast.success("Post Deleted Succefufllyu"); 
+
+
+        },
+        onError : ()=> { 
+            toast.error("Failed to delete post something went wrong"); 
+        }
+
+
+    }));
+
+    const handleDelete = (slug: string, e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        deleteConversation.mutate({ slug });
+
+        console.log("Delete post:", slug);
+        toast.success("Post deleting wait for confirmation ");
     }
 
 
@@ -96,18 +122,18 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
                                         <div className="text-secondary font-semibold">{index + 1}</div>
                                         <div className="text-left">{post.title}</div>
                                         <div>
-                                            <span className={cn("px-2 py-1 rounded-sm text-xs font-medium", 
-                                                post.status === "PUBLISHED" && "bg-secondary text-primary-foreground", 
-                                                post.status === "DRAFT" && "bg-primary-foreground/20 text-primary-foreground", 
+                                            <span className={cn("px-2 py-1 rounded-sm text-xs font-medium",
+                                                post.status === "PUBLISHED" && "bg-secondary text-primary-foreground",
+                                                post.status === "DRAFT" && "bg-primary-foreground/20 text-primary-foreground",
                                                 post.status === "UNPUBLISH" && "bg-secondary/40 text-secondary-foreground"
                                             )}>
                                                 {post.status}
                                             </span>
                                         </div>
                                         <div>
-                                            <DropPublishDraft 
-                                                value={currentStatus} 
-                                                onchange={(newStatus) => handleStatusChange(post.id, newStatus)} 
+                                            <DropPublishDraft
+                                                value={currentStatus}
+                                                onchange={(newStatus) => handleStatusChange(post.id, newStatus)}
                                             />
                                             {hasChanges && (
                                                 <div className="text-xs text-foreground/50 mt-1">
@@ -121,20 +147,20 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
                                                     <Edit className="w-4 h-4" />
                                                 </Button>
                                             </Link>
-                                            <Button 
-                                                variant={hasChanges ? "default" : "outline"} 
+                                            <Button
+                                                variant={hasChanges ? "default" : "outline"}
                                                 size="icon"
                                                 className="w-8 h-8"
-                                                onClick={() => handlesave(post)} 
+                                                onClick={() => handlesave(post)}
                                                 disabled={UpdateDocumentSatus.isPending || !hasChanges}
                                             >
                                                 <Save className="w-4 h-4" />
                                             </Button>
-                                            <Button 
-                                                variant="outline" 
+                                            <Button
+                                                variant="outline"
                                                 size="icon"
                                                 className="w-8 h-8 hover:bg-destructive hover:text-destructive-foreground"
-                                                onClick={() => handleDelete(post.id)}
+                                                onClick={() => handleDelete(post.slug)}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>

@@ -10,6 +10,9 @@ export default async function EditingPageFront() {
             title : true, 
             slug : true, 
             status : true, 
+        }, 
+        orderBy : { 
+            createdAt : "desc"
         }
     })
 
