@@ -1,105 +1,63 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-// ...existing imports...
 
-export default function SidebarDashboard() {
-    const [isOpen, setIsOpen] = useState(true);
-    const [isNewPostOpen, setIsNewPostOpen] = useState<string>("");
+type Status = "PUBLISHED" | "DRAFT" | "UNPUBLISH";
 
-    const sidebars = [
-        { name: "New Post", icon: Edit },
-        { name: "Dashboard", icon: LayoutDashboard },
-        { name: "Notification", icon: Bell }
-    ]
+type Props = {
+  value: Status | "All";
+  onChange: (status: Status | "All") => void;
+};
 
-    const subSidebar = [
-        { name: "All Posts", icon: AlignLeftIcon, href: "/dashboard/posts" },
-        { name: "Drafts", icon: FileText, href: "/dashboard/drafts" },
-        { name: "Published", icon: Archive, href: "/dashboard/published" },
-        { name: "Scheduled", icon: Clock, href: "/dashboard/scheduled" },
-    ]
-    
-    return (
-        <div className="overflow-x-hidden">
-            <div className=" ">
-                <Sidebar>
-                    <SidebarContent className="bg-secondary/10">
-                        {/* ...existing collapsible code... */}
-                        <CollapsibleContent asChild>
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{
-                                    duration: 0.3,
-                                    ease: "easeInOut",
-                                    staggerChildren: 0.1
-                                }}
-                                className="overflow-hidden"
-                            >
-                                <SidebarMenu className="ml-4">
-                                    {subSidebar.map((sidebar, index) => (
-                                        <SidebarMenuItem key={sidebar.name}>
-                                            <motion.div
-                                                initial={{ x: -20, opacity: 0 }}
-                                                animate={{ x: 0, opacity: 1 }}
-                                                transition={{
-                                                    delay: index * 0.1,
-                                                    duration: 0.2,
-                                                    ease: "easeOut"
-                                                }}
-                                            >
-                                                <SidebarMenuButton asChild>
-                                                    <Link href={sidebar.href}>
-                                                        <motion.div
-                                                            className="flex items-center cursor-pointer text-xs text-secondary-foreground p-2 rounded-lg hover:bg-accent/50 transition-colors duration-200 w-full"
-                                                            whileHover="hover"
-                                                            whileTap={{ scale: 0.95 }}
-                                                            variants={{
-                                                                hover: {
-                                                                    x: 6,
-                                                                    backgroundColor: "rgba(var(--accent))",
-                                                                }
-                                                            }}
-                                                            transition={{ duration: 0.2 }}
-                                                        >
-                                                            <motion.div
-                                                                className="mr-3"
-                                                                variants={{
-                                                                    hover: {
-                                                                        rotate: 360,
-                                                                        scale: 1.1
-                                                                    }
-                                                                }}
-                                                                transition={{ duration: 0.6 }}
-                                                            >
-                                                                <sidebar.icon className="h-3 w-3" />
-                                                            </motion.div>
-                                                            <motion.span
-                                                                variants={{
-                                                                    hover: {
-                                                                        scale: 1.05
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {sidebar.name}
-                                                            </motion.span>
-                                                        </motion.div>
-                                                    </Link>
-                                                </SidebarMenuButton>
-                                            </motion.div>
-                                        </SidebarMenuItem>
-                                    ))}
-                                </SidebarMenu>
-                            </motion.div>
-                        </CollapsibleContent>
-                        {/* ...rest of code... */}
-                    </SidebarContent>
-                </Sidebar>
-            </div>
-        </div>
-    )
+export default function FilterPostComponent({ value, onChange }: Props) {
+  const states: (Status | "All")[] = [
+    "All",
+    "PUBLISHED",
+    "DRAFT",
+    "UNPUBLISH",
+  ];
+
+  return (
+    <div className="flex justify-center">
+      <motion.div 
+        className="flex gap-2 sm:gap-6"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        {states.map((state, index) => (
+          <motion.div
+            key={state}
+            className="relative border-none"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.1, duration: 0.3 }}
+            whileHover={{ scale: 0.9 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              variant="ghost"
+              className={cn(
+                "border-none font-medium text-base relative z-10 transition-colors duration-200",
+                value === state && "text-primary-foreground"
+              )}
+              onClick={() => onChange(state)}
+            >
+              {state}
+              
+              {value === state && (
+                <motion.div
+                  layoutId="activeFilterButton"
+                  className="absolute inset-0 bg-primary rounded-lg -z-10 blur"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+            </Button>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
+  );
 }

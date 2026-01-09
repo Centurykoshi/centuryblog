@@ -25,14 +25,14 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
 
     const [posts, setPosts] = useState(initialPosts);
     const [pendingChanges, setPendingChanges] = useState<Record<string, "DRAFT" | "PUBLISHED" | "UNPUBLISH">>({});
-    type FilterType = "ALL" | "DRAFT" | "PUBLISHED" | "UNPUBLISH";
+    type FilterType = "All" | "DRAFT" | "PUBLISHED" | "UNPUBLISH";
 
 
-    const [filter, setFilter] = useState<FilterType>("ALL");
+    const [filter, setFilter] = useState<FilterType>("All");
 
 
     const filteredPosts = posts.filter(post => {
-        if (filter === "ALL") return true;
+        if (filter === "All") return true;
         return post.status === filter;
     })
     const trpc = useTRPC();
@@ -128,7 +128,7 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
                         </div>
 
                         <div>
-                            {posts.map((post, index) => {
+                            {filteredPosts.map((post, index) => {
                                 const currentStatus = pendingChanges[post.id] || post.status;
                                 const hasChanges = pendingChanges[post.id] && pendingChanges[post.id] !== post.status;
                                 return (
