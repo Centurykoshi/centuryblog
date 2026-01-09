@@ -9,6 +9,8 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import DropPublishDraft from "../Posts Components/DropDownP";
 import { Button } from "@/components/ui/button";
+import { PostStatus } from "@/generated/prisma";
+import FilterPostComponent from "../Posts Components/FilterComponent";
 
 
 type Posts = {
@@ -18,11 +20,21 @@ type Posts = {
     status: "DRAFT" | "PUBLISHED" | "UNPUBLISH";
 }
 
+
 export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
 
     const [posts, setPosts] = useState(initialPosts);
     const [pendingChanges, setPendingChanges] = useState<Record<string, "DRAFT" | "PUBLISHED" | "UNPUBLISH">>({});
+    type FilterType = "ALL" | "DRAFT" | "PUBLISHED" | "UNPUBLISH";
 
+
+    const [filter, setFilter] = useState<FilterType>("ALL");
+
+
+    const filteredPosts = posts.filter(post => {
+        if (filter === "ALL") return true;
+        return post.status === filter;
+    })
     const trpc = useTRPC();
 
     const UpdateDocumentSatus = useMutation(trpc.creating_page.updateDocument.mutationOptions({
@@ -70,18 +82,18 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
     const queryClient = useQueryClient();
 
     const deleteConversation = useMutation(trpc.creating_page.deletepage.mutationOptions({
-        onSuccess: (_,variables) => {
+        onSuccess: (_, variables) => {
 
-              setPosts(prev => prev.filter(p => p.slug !== variables.slug));
+            setPosts(prev => prev.filter(p => p.slug !== variables.slug));
 
-       
 
-            toast.success("Post Deleted Succefufllyu"); 
+
+            toast.success("Post Deleted Succefufllyu");
 
 
         },
-        onError : ()=> { 
-            toast.error("Failed to delete post something went wrong"); 
+        onError: () => {
+            toast.error("Failed to delete post something went wrong");
         }
 
 
@@ -102,6 +114,8 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
 
     return (
         <div>
+
+            <FilterPostComponent value={filter} onChange={setFilter} />
             <div className="absolute top-20 left-1/5">
                 <div className="border-2 p-8 text-secondary/40 rounded-2xl">
                     <div className="w-[60vw]">

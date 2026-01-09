@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuLab
 import { ChevronDown, MoreHorizontalIcon } from "lucide-react";
 import { useState } from "react";
 
-type Status = "PUBLISHED" | "DRAFT" | "UNPUBLISH";
+ type Status = "PUBLISHED" | "DRAFT" | "UNPUBLISH";
 
 type Props = {
     value: Status;

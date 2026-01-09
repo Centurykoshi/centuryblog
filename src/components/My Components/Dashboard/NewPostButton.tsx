@@ -35,7 +35,7 @@ export default function NewPostButton() {
 
             toast.success("Post created!", { id: "createpost" });
             setiscreating(false);
-            router.push(data.url);
+            window.open(data.url, "_blank")
         } catch (error: any) {
             toast.error("Error: " + (error.message || "Failed to create post"), { id: "createpost" });
             console.error("Error creating new page", error);
