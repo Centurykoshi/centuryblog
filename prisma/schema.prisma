@@ -28,6 +28,7 @@ model Document {
   featuredImg String?
   status      PostStatus @default(DRAFT)
   published   DateTime?
+  Tag         Tag        @default(All)
 
   @@index([status])
   @@index([published])
@@ -68,19 +69,12 @@ enum PostStatus {
   UNPUBLISH
 }
 
-model Tag {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  slug        String    @unique
-  description String?
-  color       String? // Hex color for tag styling
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  posts       PostTag[]
-
-  @@index([name])
-  @@index([slug])
-  @@map("tags")
+enum Tag {
+  All
+  Tech
+  LifeStyle
+  Travel
+  Games
 }
 
 model PostTag {
@@ -88,7 +82,6 @@ model PostTag {
   tagId  String
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([postId, tagId])
   @@map("post_tags")
