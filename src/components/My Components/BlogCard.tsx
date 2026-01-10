@@ -6,22 +6,30 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
-import { ArrowLeft, ArrowRight,  } from "lucide-react";
-export default function BlogCard({ blog, onTitleClick }: { blog: any, onTitleClick: (title: string) => void }) {
+import { ArrowLeft, ArrowRight, } from "lucide-react";
 
-    const { title, description, category, _id } = blog;
+type Blog = {
+    id: string;
+    title: string;
+    slug: string;
+    Tag: "All" | "Tech" | "LifeStyle" | "Games" | "Travel";
+    excerpt: string;
+
+}
+export default function BlogCard({ blog, onTitleClick }: { blog : Blog , onTitleClick: (tag: string) => void }) {
+
     const [isHovered, setIsHovered] = useState(false);
     const [isHoveredRead, setIsHoveredRead] = useState(false);
     return (
         <motion.div className="flex flex-col justify-start  max-w-xl relative">
             <div className="">
-                <h2 className="mb-4"><Link href={`/blog/${title}`} className="no-underline text-xl font-semibold hover:underline hover:decoration-primary hover:decoration-2 hover:underline-offset-2" onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)} style={{ textDecorationSkipInk: "auto" }}>{title}</Link></h2>
+                <h2 className="mb-4"><div className="no-underline text-xl font-semibold hover:underline hover:decoration-primary hover:decoration-2 hover:underline-offset-2" onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)} style={{ textDecorationSkipInk: "auto" }}>{blog.title}</div></h2>
             </div>
 
 
 
-            <p className="text-muted-foreground relative">{description}</p>
+            <p className="text-muted-foreground relative">{blog.excerpt}</p>
 
             <div className="relative w-fit mb-4 mt-4 ">
                 <motion.div
@@ -34,10 +42,10 @@ export default function BlogCard({ blog, onTitleClick }: { blog: any, onTitleCli
                     <Button
                         variant={"ghost"}
                         className="text-xs font-semibold text-muted-foreground border-none relative z-10 px-3 py-1"
-                        onClick={() => onTitleClick(category)}
+                        onClick={() => onTitleClick(blog.Tag)}
 
                     >
-                        {category}
+                        {blog.Tag}
                         <div className="absolute inset-0 bg-primary rounded-lg -z-10 blur" />
                     </Button>
 
@@ -45,7 +53,7 @@ export default function BlogCard({ blog, onTitleClick }: { blog: any, onTitleCli
 
             </div>
 
-            <Link href={`/blog/${title}`} className="no-underline w-fit inline hover:animate-pulse text-sm font-semibold mt-2 "
+            <Link href={`/blog/${blog.title}`} className="no-underline w-fit inline hover:animate-pulse text-sm font-semibold mt-2 "
                 onMouseEnter={() => setIsHoveredRead(true)}
                 onMouseLeave={() => setIsHoveredRead(false)}
             >

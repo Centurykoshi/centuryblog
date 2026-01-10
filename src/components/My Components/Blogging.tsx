@@ -9,7 +9,20 @@ import { blogPosts } from "@/data/blogPosts"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 
-export default function Blogging() {
+type Details = {
+    id: string;
+    title: string;
+    slug: string;
+    contentHTML: string;
+    Tag: "All" | "Tech" | "LifeStyle" | "Games" | "Travel";
+    excerpt : string;
+
+
+
+
+}
+
+export default function Blogging({ initialDetails }: { initialDetails: Details[] }) {
     const Category = [
         { name: "All" },
         { name: "Tech" },
@@ -20,6 +33,14 @@ export default function Blogging() {
     ]
 
     const [iscategory, setIscategory] = useState("All");
+
+    const [details, setdetails] = useState(initialDetails);
+
+
+    const filteredDetails = details.filter(detail => {
+        if (iscategory === "All") return true;
+        return detail.Tag === iscategory;
+    })
 
 
 
@@ -81,7 +102,7 @@ export default function Blogging() {
 
 
                     <div className="flex flex-col ml-[30vh] sm:ml-[10vh] gap-6 lg:ml-[30vh] ">
-                        {blogPosts.filter((blog) => iscategory === "All" || blog.category === iscategory).map((blog) => <BlogCard blog={blog} key={blog._id} onTitleClick={setIscategory} />)}
+                        {filteredDetails.map((blog) => <BlogCard blog={blog} key={blog.id} onTitleClick={setIscategory} />)}
 
                     </div>
                 </div>
@@ -95,9 +116,9 @@ export default function Blogging() {
 
                                 <div className="flex flex-col gap-2">
 
-                                    {blogPosts.map((blog) => (
+                                    {filteredDetails.map((blog) => (
                                         <Link
-                                            key={blog._id}
+                                            key={blog.id}
                                             href={`/blog/${blog.title}`}
                                             className="group inline-block no-underline transition-colors hover:text-secondary-foreground"
                                         >
