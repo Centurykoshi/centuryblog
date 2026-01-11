@@ -80,6 +80,7 @@ import { handleImageUpload, handleImageDelete, MAX_FILE_SIZE } from "@/lib/tipta
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
+import TagsSelection from "./TagsSeletion"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -346,6 +347,10 @@ export function SimpleEditor() {
     )
   );
 
+  type TagSelection = "All" | "Travel" | "LifeStyle" | "Games" | "Tech";
+
+  const [filter, setFilter] = useState<TagSelection>("All");
+
   //enabled tells react query when to run something  so here when slug is undefined it won't run but when it is defined it will run 
 
   // Load content into editor when data is available
@@ -360,6 +365,11 @@ export function SimpleEditor() {
         // Load featured image
         if (documentData.document.featuredImg) {
           setFeaturedImage(documentData.document.featuredImg)
+        }
+
+        if (documentData.document.Tag) {
+          setFilter(documentData.document.filter);
+          console.log("Tag : " + documentData.document.Tag); 
         }
 
         const querydata = documentData?.document.contentJSON;
@@ -387,7 +397,7 @@ export function SimpleEditor() {
     autoSaveTimeoutRef.current = setTimeout(() => {
       if (editor && slug) {
         const currentContent = JSON.stringify(editor.getJSON())
-        const currentState = JSON.stringify({ content: currentContent, title, featuredImage, imagePosition })
+        const currentState = JSON.stringify({ content: currentContent, title, featuredImage, imagePosition, filter })
         const lastState = JSON.stringify({ content: lastSavedContent, title: documentData?.document?.title || '', featuredImage: documentData?.document?.featuredImg || '', imagePosition: { x: 50, y: 50 } })
 
         if (currentState !== lastState && saveStatus === 'idle') {
@@ -397,7 +407,7 @@ export function SimpleEditor() {
         }
       }
     }, 3000)
-  }, [editor, slug, title, featuredImage]) // Include title and featuredImage in deps
+  }, [editor, slug, title, featuredImage, filter]) // Include title and featuredImage in deps
 
   // Save function
   const saveDocument = useCallback(async () => {
@@ -421,6 +431,7 @@ export function SimpleEditor() {
         contentJSON,
         contentHTML,
         featuredImg: featuredImage || undefined,
+        Tag : filter, 
       })
       setLastSavedContent(contentJSON)
     } catch (error) {
@@ -506,7 +517,7 @@ export function SimpleEditor() {
   }, [saveDocument])
 
   return (
-    <div className="min-h-screen min-w-screen overflow-auto flex flex-col items-center">
+    <div className="min-h-screen min-w-screen overflow-x-autoauto flex flex-col items-center">
       <EditorContext.Provider value={{ editor }}>
         {/* Title Section */}
 
@@ -701,15 +712,17 @@ export function SimpleEditor() {
         </Toolbar>
 
         {/* Content Editor */}
-        <div className="simple-editor-content-wrapper">
+        <div className=" max-w-200 flex items-center felx-col w-full min-h-40 bg-red-500">
           <EditorContent
             editor={editor}
             role="presentation"
-            className="simple-editor-content"
+            className="flex-1 p-2"
             placeholder="Start writing your article content here..."
           />
         </div>
       </EditorContext.Provider>
+
+      <TagsSelection value={filter} onChange={setFilter} />
     </div>
   )
 }

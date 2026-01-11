@@ -119,6 +119,7 @@ export const CreatingPage = createTRPCRouter({
                 contentHTML: z.string().optional(),
                 excerpt: z.string().optional(),
                 featuredImg: z.string().optional(),
+                Tag: z.enum(["All", "Travel", "LifeStyle", "Games", "Tech"]).optional(),
                 status: z.enum(["DRAFT", "PUBLISHED", "UNPUBLISH"]).optional(),
             })
         )
@@ -160,6 +161,7 @@ export const CreatingPage = createTRPCRouter({
                     featuredImg: input.featuredImg || existingDocument.featuredImg,
                     status: input.status || existingDocument.status,
                     updatedAt: new Date(),
+                    Tag: input.Tag || existingDocument.Tag,
                 }
             });
 

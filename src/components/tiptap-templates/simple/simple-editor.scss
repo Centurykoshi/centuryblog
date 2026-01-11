@@ -422,38 +422,38 @@ body,
   flex-direction: column;
 }
 
-.simple-editor-content .tiptap.ProseMirror.simple-editor {
-  flex: 1;
-  padding: 1rem 3rem 30vh;
+// .simple-editor-content .tiptap.ProseMirror.simple-editor {
+//   flex: 1;
+//   padding: 1rem 3rem 1rem ;
 
-  // Add placeholder styles for content area
-  &:before {
-    content: attr(data-placeholder);
-    position: absolute;
-    color: var(--tt-gray-400, #9ca3af);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
+//   // Add placeholder styles for content area
+//   &:before {
+//     content: attr(data-placeholder);
+//     position: absolute;
+//     color: var(--tt-gray-400, #9ca3af);
+//     pointer-events: none;
+//     opacity: 0;
+//     transition: opacity 0.2s;
+//   }
 
-  &.is-empty:before {
-    opacity: 1;
-  }
+//   &.is-empty:before {
+//     opacity: 1;
+//   }
 
-  // Ensure no h1 since we have separate title
-  h1 {
-    display: none;
-  }
+//   // Ensure no h1 since we have separate title
+//   h1 {
+//     display: none;
+//   }
 
-  // Style h2 as the main heading in content
-  h2 {
-    font-size: 1.875rem;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-  }
-}
+//   // Style h2 as the main heading in content
+//   h2 {
+//     font-size: 1.875rem;
+//     font-weight: 700;
+//     line-height: 1.2;
+//     margin-top: 2rem;
+//     margin-bottom: 1rem;
+//   }
+// }
 
 @media screen and (max-width: 480px) {
   .simple-editor-content .tiptap.ProseMirror.simple-editor {
