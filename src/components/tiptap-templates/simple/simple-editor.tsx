@@ -362,11 +362,11 @@ export function SimpleEditor() {
           setFeaturedImage(documentData.document.featuredImg)
         }
 
-        const querydata = documentData?.document.contentJSON; 
+        const querydata = documentData?.document.contentJSON;
 
         // Load content
         if (querydata) {
-          const contentString = String(documentData.document.contentJSON); 
+          const contentString = String(documentData.document.contentJSON);
           const content = JSON.parse(contentString)
           editor.commands.setContent(content)
           setLastSavedContent(contentString)
@@ -413,7 +413,7 @@ export function SimpleEditor() {
       const contentHTML = editor.getHTML()
       // Use the dedicated title state instead of extracting from content
       const documentTitle = title.trim() || undefined;
-      
+
 
       await updateDocumentMutation.mutateAsync({
         slug,
@@ -506,24 +506,15 @@ export function SimpleEditor() {
   }, [saveDocument])
 
   return (
-    <div className="simple-editor-wrapper">
+    <div className="min-h-screen min-w-screen overflow-auto flex flex-col items-center">
       <EditorContext.Provider value={{ editor }}>
         {/* Title Section */}
-        <div className="simple-editor-header">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter your article title..."
-            className="simple-editor-title-input"
-            maxLength={200}
-          />
-        </div>
+
 
         {/* Featured Image Section */}
-        <div className="simple-editor-featured-image">
+        <div className="max-w-226 w-full opacity-80 bg-secondary/20">
           {featuredImage ? (
-            <div className="featured-image-container">
+            <div className="featured-image-container ">
               <div className="featured-image-wrapper">
                 <img
                   src={featuredImage}
@@ -533,6 +524,8 @@ export function SimpleEditor() {
                     objectPosition: `${imagePosition.x}% ${imagePosition.y}%`
                   }}
                 />
+
+                <div className="absolute bg-secondary/10 inset-0"></div>
 
                 {/* Remove Button (Top Right) */}
                 <button
@@ -667,6 +660,17 @@ export function SimpleEditor() {
               </label>
             </div>
           )}
+        </div>
+
+        <div className=" max-w-226 w-full whitespace-normal wrap-break-word m-auto mb-2 p-2  border-b-secondary border-b-2">
+          <textarea
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter your article title..."
+            className="w-full border-none outline-none text-3xl font-medium text-secondary-foreground/50 resize-none overflow-hidden"
+            maxLength={200}
+            rows={3}
+          />
         </div>
 
         {/* Toolbar */}

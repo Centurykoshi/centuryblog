@@ -16,7 +16,7 @@ type Blog = {
     excerpt: string;
 
 }
-export default function BlogCard({ blog, onTitleClick }: { blog : Blog , onTitleClick: (tag: string) => void }) {
+export default function BlogCard({ blog, onTitleClick }: { blog: Blog, onTitleClick: (tag: string) => void }) {
 
     const [isHovered, setIsHovered] = useState(false);
     const [isHoveredRead, setIsHoveredRead] = useState(false);
@@ -29,7 +29,7 @@ export default function BlogCard({ blog, onTitleClick }: { blog : Blog , onTitle
 
 
 
-            <p className="text-muted-foreground relative">{blog.excerpt}</p>
+            <p className="text-muted-foreground relative"> {blog.excerpt}</p>
 
             <div className="relative w-fit mb-4 mt-4 ">
                 <motion.div

@@ -9,6 +9,20 @@ function generateSlug(title: string): string {
     return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').replace(/--+/g, '-').trim();
 }
 
+
+function generateExcerpt(contentHTML?: string, length = 150) {
+
+    if (!contentHTML || contentHTML.trim() === "") {
+        return undefined;
+    }
+    return contentHTML
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .slice(0, length)
+        .trim() + "... ";
+}
+
+
 export const CreatingPage = createTRPCRouter({
 
     createpage: baseProcedure
@@ -125,6 +139,8 @@ export const CreatingPage = createTRPCRouter({
                 }
             });
 
+            const pxcerpt = generateExcerpt(input.contentHTML);
+
             if (!existingDocument) {
                 throw new TRPCError({
                     code: "NOT_FOUND",
@@ -140,7 +156,7 @@ export const CreatingPage = createTRPCRouter({
                     title: input.title || existingDocument.title,
                     contentJSON: input.contentJSON || existingDocument.contentJSON || "{}",
                     contentHTML: input.contentHTML || existingDocument.contentHTML,
-                    excerpt: input.excerpt || existingDocument.excerpt,
+                    excerpt: pxcerpt,
                     featuredImg: input.featuredImg || existingDocument.featuredImg,
                     status: input.status || existingDocument.status,
                     updatedAt: new Date(),

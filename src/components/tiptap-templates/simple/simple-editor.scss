@@ -89,13 +89,7 @@ body,
   font-family: "DM Sans", sans-serif;
 }
 
-.simple-editor-wrapper {
-  width: 100vw;
-  height: 100vh;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-}
+
 
 // Editor Header with Title Input
 .simple-editor-header {
@@ -110,31 +104,6 @@ body,
   }
 }
 
-.simple-editor-title-input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: "DM Sans", sans-serif;
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--tt-theme-text);
-  resize: none;
-  overflow: hidden;
-
-  &::placeholder {
-    color: var(--tt-gray-400, #9ca3af);
-  }
-
-  @media screen and (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media screen and (max-width: 480px) {
-    font-size: 1.5rem;
-  }
-}
 
 // Featured Image Section
 .simple-editor-featured-image {
