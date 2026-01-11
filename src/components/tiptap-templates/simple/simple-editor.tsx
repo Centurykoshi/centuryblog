@@ -368,8 +368,8 @@ export function SimpleEditor() {
         }
 
         if (documentData.document.Tag) {
-          setFilter(documentData.document.filter);
-          console.log("Tag : " + documentData.document.Tag); 
+          setFilter(documentData.document.Tag);
+          console.log("Tag loaded: " + documentData.document.Tag);
         }
 
         const querydata = documentData?.document.contentJSON;
@@ -431,7 +431,7 @@ export function SimpleEditor() {
         contentJSON,
         contentHTML,
         featuredImg: featuredImage || undefined,
-        Tag : filter, 
+        Tag: filter,
       })
       setLastSavedContent(contentJSON)
     } catch (error) {
@@ -517,7 +517,7 @@ export function SimpleEditor() {
   }, [saveDocument])
 
   return (
-    <div className="min-h-screen min-w-screen overflow-x-autoauto flex flex-col items-center">
+    <div className="min-h-screen min-w-screen overflow-x-auto overflow-y-hidden flex flex-col items-center">
       <EditorContext.Provider value={{ editor }}>
         {/* Title Section */}
 
@@ -673,14 +673,14 @@ export function SimpleEditor() {
           )}
         </div>
 
-        <div className=" max-w-226 w-full whitespace-normal wrap-break-word m-auto mb-2 p-2  border-b-secondary border-b-2">
+        <div className=" max-w-226 w-full whitespace-normal wrap-break-word m-2  p-2  border-b-secondary border-b-2">
           <textarea
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter your article title..."
             className="w-full border-none outline-none text-3xl font-medium text-secondary-foreground/50 resize-none overflow-hidden"
             maxLength={200}
-            rows={3}
+            rows={2}
           />
         </div>
 
@@ -712,11 +712,11 @@ export function SimpleEditor() {
         </Toolbar>
 
         {/* Content Editor */}
-        <div className=" max-w-200 flex items-center felx-col w-full min-h-40 bg-red-500">
+        <div className=" max-w-200 flex items-center felx-col w-full min-h-40">
           <EditorContent
             editor={editor}
             role="presentation"
-            className="flex-1 p-2"
+            className=" pb-20 simple-editor-content text-secondary-foreground"
             placeholder="Start writing your article content here..."
           />
         </div>
