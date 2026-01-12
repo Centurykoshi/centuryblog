@@ -21,7 +21,7 @@ type Posts = {
 export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
 
     const [posts, setPosts] = useState(initialPosts);
-    const [pendingChanges, setPendingChanges] = useState<Record<string, "DRAFT" | "PUBLISHED" | "UNPUBLISH">>({});
+    const [pendingChanges, setPendingChanges] = useState < Record < string, "DRAFT" | "PUBLISHED" | "UNPUBLISH" >> ({});
 
     const trpc = useTRPC();
 
@@ -93,7 +93,7 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
                                 return (
                                     <div key={post.id} className={cn("grid grid-cols-4 gap-10 p-6 text-lg text-primary text-shadow-m text-center border-b last:border-b-0")}>
                                         <div className="text-secondary font-semibold">{index + 1}</div>
-                                        <div className="flex gap-2 justify-between"><span>{post.title} </span><Link href={`/dashboard/edit/${post.slug}`}> <Edit className="w-5 h-5 text-right m-1 hover:rotate-360 hover:text-secondary-foreground transition-all ease-in-out duration-700 cursor-pointer" /></Link> </div>
+                                        <div className="flex gap-2 justify-between"><span>{post.title} </span><Link href={`/dashboard/edit/${post.id}`}> <Edit className="w-5 h-5 text-right m-1 hover:rotate-360 hover:text-secondary-foreground transition-all ease-in-out duration-700 cursor-pointer" /></Link> </div>
                                         <div className="captilize text-sm"><span className={cn("px-2 py-1 rounded-sm text-xs font-medium", post.status === "PUBLISHED" && "bg-secondary text-primary-foreground", post.status === "DRAFT" && "bg-primary-foreground/20 text-primary-foreground", post.status === "UNPUBLISH" && "bg-secondary/40 text-secondary-foreground")}>{post.status}</span></div>
                                         <div className=" flex gap-2 justify-between"><DropPublishDraft value={currentStatus} onchange={(newStatus) => handleStatusChange(post.id, newStatus)} />
                                             <span><Button className="w-10" variant={hasChanges ? "default" : "outline"} onClick={() => handlesave(post)} disabled={UpdateDocumentStatus.isPending || !hasChanges}><Save className="w-4 h-4" /></Button> {hasChanges && (<span className="text-xs text-foreground/50"> {pendingChanges[post.id]}</span>)}</span>

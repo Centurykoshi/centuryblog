@@ -5,7 +5,10 @@ import { TRPCError } from "@trpc/server";
 import { title } from "process";
 import z from "zod";
 
-function generateSlug(title: string): string {
+function generateSlug(title?: string) {
+    if (!title) {
+        return "untitled-page";
+    }
     return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').replace(/--+/g, '-').trim();
 }
 
@@ -28,7 +31,7 @@ export const CreatingPage = createTRPCRouter({
     createpage: baseProcedure
         .input(
             z.object({
-                title: z.string("Untitled Page"),
+                title: z.string().default("Untitled Page"),
                 contentJSON: z.string().optional(),
                 slug: z.string().optional(),
                 featuredImg: z.string().optional(),
@@ -67,7 +70,7 @@ export const CreatingPage = createTRPCRouter({
             return {
                 success: true,
                 page: newPage,
-                url: `/dashboard/edit/${newPage.slug}`
+                url: `/dashboard/edit/${newPage.id}`
 
             };
 
@@ -76,7 +79,7 @@ export const CreatingPage = createTRPCRouter({
     getDocument: baseProcedure
         .input(
             z.object({
-                slug: z.string(),
+                id: z.string(),
             })
         )
         .query(async ({ input, ctx }) => {
@@ -91,7 +94,7 @@ export const CreatingPage = createTRPCRouter({
 
             const document = await prisma.document.findFirst({
                 where: {
-                    slug: input.slug,
+                    id: input.id,
 
                 },
             });
@@ -113,7 +116,7 @@ export const CreatingPage = createTRPCRouter({
     updateDocument: baseProcedure
         .input(
             z.object({
-                slug: z.string(),
+                id: z.string(),
                 title: z.string().optional(),
                 contentJSON: z.string().optional(),
                 contentHTML: z.string().optional(),
@@ -135,12 +138,31 @@ export const CreatingPage = createTRPCRouter({
 
             const existingDocument = await prisma.document.findFirst({
                 where: {
-                    slug: input.slug,
+                    id: input.id,
 
                 }
             });
 
             const pxcerpt = generateExcerpt(input.contentHTML);
+
+
+            let finalSlug = existingDocument?.slug;
+            if (input.title && input.title !== existingDocument?.title) {
+                let newSlug = generateSlug(input.title);
+                let uniqueSlug = newSlug;
+                let counter = 1
+
+                while (await prisma.document.findFirst({
+                    where: {
+                        slug: uniqueSlug,
+                        id: { not: existingDocument?.id }
+                    }
+                })) {
+                    uniqueSlug = `${newSlug}-${counter}`;
+                    counter++;
+                }
+                finalSlug = uniqueSlug;
+            }
 
             if (!existingDocument) {
                 throw new TRPCError({
@@ -161,6 +183,7 @@ export const CreatingPage = createTRPCRouter({
                     featuredImg: input.featuredImg || existingDocument.featuredImg,
                     status: input.status || existingDocument.status,
                     updatedAt: new Date(),
+                    slug: finalSlug,
                     Tag: input.Tag || existingDocument.Tag,
                 }
             });
@@ -168,6 +191,8 @@ export const CreatingPage = createTRPCRouter({
             return {
                 success: true,
                 document: updateDocument,
+                newSlug: updateDocument.slug, // it's just final slug we don't even have to write this 
+                urlChanged: finalSlug !== existingDocument.slug
             };
         }),
 
