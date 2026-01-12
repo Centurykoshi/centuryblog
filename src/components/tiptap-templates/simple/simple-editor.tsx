@@ -232,7 +232,7 @@ export function SimpleEditor() {
   )
   const toolbarRef = useRef<HTMLDivElement>(null)
   const params = useParams()
-  const slug = params?.slug as string
+  const id = params?.id as string
 
   // Save states
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
@@ -310,6 +310,11 @@ export function SimpleEditor() {
     if (updateDocumentMutation.isSuccess) {
       setSaveStatus("saved");
       t = setTimeout(() => setSaveStatus("idle"), 2000);
+
+      const data = updateDocumentMutation.data;
+      if (data?.urlChanged && data?.document?.id) {
+        window.history.replaceState(null, '', `/dashboard/edit/${data.document.id}`);
+      }
     } else if (updateDocumentMutation.isError) {
       setSaveStatus("error");
       t = setTimeout(() => setSaveStatus("idle"), 2000);
@@ -321,6 +326,7 @@ export function SimpleEditor() {
   }, [
     updateDocumentMutation.isSuccess,
     updateDocumentMutation.isError,
+    updateDocumentMutation.data,
   ]);
 
 
@@ -342,12 +348,15 @@ export function SimpleEditor() {
   // Load document content query
   const { data: documentData } = useQuery(
     trpc.creating_page.getDocument.queryOptions(
-      { slug },
-      { enabled: !!slug }
+      { id },
+      { enabled: !!id }
     )
   );
 
   type TagSelection = "All" | "Travel" | "LifeStyle" | "Games" | "Tech";
+
+
+
 
   const [filter, setFilter] = useState<TagSelection>("All");
 
@@ -395,7 +404,7 @@ export function SimpleEditor() {
     }
 
     autoSaveTimeoutRef.current = setTimeout(() => {
-      if (editor && slug) {
+      if (editor && id) {
         const currentContent = JSON.stringify(editor.getJSON())
         const currentState = JSON.stringify({ content: currentContent, title, featuredImage, imagePosition, filter })
         const lastState = JSON.stringify({ content: lastSavedContent, title: documentData?.document?.title || '', featuredImage: documentData?.document?.featuredImg || '', imagePosition: { x: 50, y: 50 } })
@@ -407,14 +416,21 @@ export function SimpleEditor() {
         }
       }
     }, 3000)
-  }, [editor, slug, title, featuredImage, filter]) // Include title and featuredImage in deps
+  }, [editor, id, title, featuredImage, filter]) // Include title and featuredImage in deps
 
   // Save function
   const saveDocument = useCallback(async () => {
-    if (!editor || !slug) return
+    console.log('saveDocument called', { editor: !!editor, id, saveStatus });
+    if (!editor || !id) {
+      console.log('Save blocked: missing editor or id');
+      return;
+    }
 
     // Check status again inside the function to avoid dependency issues
-    if (saveStatus === 'saving') return
+    if (saveStatus === 'saving') {
+      console.log('Save blocked: already saving');
+      return;
+    }
 
     setSaveStatus('saving')
 
@@ -424,9 +440,9 @@ export function SimpleEditor() {
       // Use the dedicated title state instead of extracting from content
       const documentTitle = title.trim() || undefined;
 
-
+      console.log('Saving document with id:', id);
       await updateDocumentMutation.mutateAsync({
-        slug,
+        id,
         title: documentTitle,
         contentJSON,
         contentHTML,
@@ -434,10 +450,11 @@ export function SimpleEditor() {
         Tag: filter,
       })
       setLastSavedContent(contentJSON)
+      console.log('Save successful');
     } catch (error) {
       console.error('Save failed:', error)
     }
-  }, [editor, slug, updateDocumentMutation, title, featuredImage])
+  }, [editor, id, updateDocumentMutation, title, featuredImage, filter, saveStatus])
 
   // Add onUpdate to editor after initialization
   useEffect(() => {

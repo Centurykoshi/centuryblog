@@ -76,7 +76,7 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
 
         try {
             await UpdateDocumentSatus.mutateAsync({
-                slug: post.slug,
+                id: post.id,
                 status: pendingStatus
             });
 
@@ -174,7 +174,7 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
                                                 )}
                                             </div>
                                             <div className="flex gap-2 justify-center">
-                                                <Link href={`/dashboard/edit/${post.slug}`}>
+                                                <Link href={`/dashboard/edit/${post.id}`}>
                                                     <Button variant="outline" size="icon" className="w-8 h-8">
                                                         <Edit className="w-4 h-4" />
                                                     </Button>
