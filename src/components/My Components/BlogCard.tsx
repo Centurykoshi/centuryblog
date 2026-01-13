@@ -53,7 +53,7 @@ export default function BlogCard({ blog, onTitleClick }: { blog: Blog, onTitleCl
 
             </div>
 
-            <Link href={`/blog/${blog.title}`} className="no-underline w-fit inline hover:animate-pulse text-sm font-semibold mt-2 "
+            <Link href={`/Blog/${blog.slug}`} className="cursor-pointer no-underline w-fit inline hover:animate-pulse text-sm font-semibold mt-2 "
                 onMouseEnter={() => setIsHoveredRead(true)}
                 onMouseLeave={() => setIsHoveredRead(false)}
             >
