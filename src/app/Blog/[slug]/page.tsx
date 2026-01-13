@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 
 export default async function page({ params }: { params: { slug: string } }) {
 
-    const { slug } = await await params;
+    const { slug } =  await params;
 
     const BlogDetails = await prisma.document.findUnique({
 
