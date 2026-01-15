@@ -96,6 +96,7 @@ export const CreatingPage = createTRPCRouter({
                 where: {
                     id: input.id,
 
+
                 },
             });
 
@@ -124,6 +125,7 @@ export const CreatingPage = createTRPCRouter({
                 featuredImg: z.string().optional(),
                 Tag: z.enum(["All", "Travel", "LifeStyle", "Games", "Tech"]).optional(),
                 status: z.enum(["DRAFT", "PUBLISHED", "UNPUBLISH"]).optional(),
+                Author: z.string().default("Piyush").optional(),
             })
         )
         .mutation(async ({ input, ctx }) => {
@@ -185,6 +187,8 @@ export const CreatingPage = createTRPCRouter({
                     updatedAt: new Date(),
                     slug: finalSlug,
                     Tag: input.Tag || existingDocument.Tag,
+                    Author: input.Author,
+                    published: input.status === "PUBLISHED" ? new Date() : null,
                 }
             });
 

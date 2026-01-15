@@ -77,7 +77,8 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
         try {
             await UpdateDocumentSatus.mutateAsync({
                 id: post.id,
-                status: pendingStatus
+                status: pendingStatus,
+                
             });
 
             setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: pendingStatus } : p));

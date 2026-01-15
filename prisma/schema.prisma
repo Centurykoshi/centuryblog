@@ -29,6 +29,7 @@ model Document {
   status      PostStatus @default(DRAFT)
   published   DateTime?
   Tag         Tag        @default(All)
+  Author      String? @default("Piyush")
 
   @@index([status])
   @@index([published])
