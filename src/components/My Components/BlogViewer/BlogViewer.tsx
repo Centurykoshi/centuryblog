@@ -6,6 +6,7 @@ import { useState } from "react";
 import styles from "./BlogRender.module.css"
 
 
+
 type Blogs = {
     id: string;
     slug: string;
@@ -14,7 +15,7 @@ type Blogs = {
     featuredImg: string | null;
     Author: string | null;
     published: Date | null;
-
+    contentJSON: JSON;
 
 
 
@@ -24,6 +25,42 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
 
 
     const [blogdetail, setblogdetail] = useState(intialBlogs);
+
+    const content = typeof blogdetail.contentJSON === "string" ? JSON.parse(blogdetail.contentJSON) : blogdetail.contentJSON;
+
+    function groupImages(nodes : any[]){ 
+        const result : any[] = [];
+        
+        let imageGroup : string[] = []; 
+        
+    }
+
+
+    function extractimagesfromjson(value: any) {
+
+        const images: string[] = [];
+        function walk(node: any) {
+            if (!node) return;
+
+            if (node.type === "imageWithDelete" && node.attrs?.src) {
+                images.push(node.attrs.src);
+            }
+
+            if (node.content) {
+                node.content?.forEach(walk);
+
+            }
+        }
+
+        walk(value);
+
+        return images;
+
+    }
+
+    const images = extractimagesfromjson(blogdetail.contentJSON);
+
+
 
     const DatePublished = blogdetail.published ? new Date(blogdetail.published).toLocaleDateString("en-GB", {
         year: "numeric",
@@ -73,24 +110,34 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
 
                             <div className="blog-Content prose prose-lg prose-indigo" dangerouslySetInnerHTML={{ __html: blogdetail.contentHTML }} />
 
+                            <div className="grid grid-cols-3 gap-2">
+                                {images.slice(0, 3).map((src, i) => (
+                                    <img key={i} src={src} alt="" />
+                                ))}
+
+                                Hi
+
+                            </div>
 
 
 
 
+
+
+                        </div>
                     </div>
-                </div>
 
 
+
+
+
+
+                </div >
 
 
 
 
             </div >
-
-
-
-
-        </div >
         </>
     )
 }

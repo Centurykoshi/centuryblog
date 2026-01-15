@@ -21,6 +21,7 @@ export default async function page({ params }: { params: { slug: string } }) {
             featuredImg: true,
             Author: true,
             published: true,
+            contentJSON: true,
 
         }
     })
