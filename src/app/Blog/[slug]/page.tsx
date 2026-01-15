@@ -1,9 +1,11 @@
+import Navbar from "@/components/CreatePage/Navbar";
 import BlogViewer from "@/components/My Components/BlogViewer/BlogViewer";
+import Header from "@/components/My Components/header";
 import prisma from "@/lib/prisma";
 
 export default async function page({ params }: { params: { slug: string } }) {
 
-    const { slug } =  await params;
+    const { slug } = await params;
 
     const BlogDetails = await prisma.document.findUnique({
 
@@ -17,6 +19,8 @@ export default async function page({ params }: { params: { slug: string } }) {
             slug: true,
             contentHTML: true,
             featuredImg: true,
+            Author: true,
+            published: true,
 
         }
     })
@@ -27,6 +31,7 @@ export default async function page({ params }: { params: { slug: string } }) {
 
     return (
         <>
+            <Header />
             <BlogViewer intialBlogs={BlogDetails} />
         </>
     )

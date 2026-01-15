@@ -27,7 +27,7 @@ export default function Header() {
     return (
 
         <>
-            <div className="flex justify-start flex-col p-4 ">
+            <div className="flex justify-start flex-col p-4 sticky top-0 z-50 bg-background/80 backdrop-blur-2xl">
                 <div className="max-w-6xl w-full justify-between flex">
 
                     <div className="max-w-xl w-full justify-between flex relative left-[25%]">
