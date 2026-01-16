@@ -63,7 +63,8 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
         year: "numeric",
         month: "long",
         day: "numeric"
-    }) : "Not Published get better and put the data ";
+    }) : "Not Published get better and put the data "
+
 
 
 
