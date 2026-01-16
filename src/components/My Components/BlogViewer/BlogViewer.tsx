@@ -63,7 +63,8 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
         year: "numeric",
         month: "long",
         day: "numeric"
-    }) : "Not Published get better and put the data ";
+    }) : "Not Published get better and put the data "
+
 
 
 
@@ -85,7 +86,45 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
             );
         }
 
-        
+        if (node.type === "bulletList") {
+            return (
+                <ul className="space-y-2 text-secondary-foreground list-inside my-6 mx-6 list-disc pl-6">
+                    {node.content?.map((item: any, i: number) => (
+                        <li key={i}>{item.content?.[0]?.content?.map((t: any) => t.text).join("")}</li>
+                    ))}
+
+                </ul>
+            )
+        };
+
+        if (node.type === "orderedList") {
+            return (
+                <ol className="space-y-2 marker:font-semibold marker:text-primary-foreground text-secondary-foreground list-inside pl-6 mx-6 list-decimal my-6">
+                    {node.content?.map((item: any, i: number) => (<li
+                        key={i} >
+                        {item.content?.[0]?.content?.map((t: any) => t.text)}
+
+                    </li>))}
+
+                </ol>
+            )
+        }
+
+        if (node.type === "horizontalRule") {
+            return <hr className="my-8 border-t-2  border-t-secondary" />;
+        }
+        if (node.type === "blockquote") {
+            return (
+                <blockquote className="border-l-4 border-primary pl-6 py-4 my-6 italic text-secondary-foreground bg-muted/40 rounded-r-lg">
+                    {node.content?.map((item: any, idx: number) => (
+                        <EditorBlocks key={idx} node={item} />
+                    ))}
+                </blockquote>
+            );
+        }
+
+
+
 
         return null;
     }
@@ -123,9 +162,13 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
                         {blogdetail.title}
 
                     </div>
+
+                    <div className="relative z-10 text-primary-foreground left-1/8 bottom-1/10">
+                        by {blogdetail.Author}
+                    </div>
                 </div>
 
-                <div className="max-w-6xl w-full px-4 py-10 ">
+                <div className="max-w-5xl w-full px-4 py-10 ">
                     {groupedImagesdata.map((block, i) => {
                         if (block.type === "image-group") {
                             if (block.images.length === 1) {
