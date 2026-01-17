@@ -183,7 +183,10 @@ export default function SidebarDashboard() {
                                                     >
                                                         <sidebar.icon className="h-4 w-4" />
                                                     </motion.div>
-                                                    <span>{sidebar.name}</span>
+                                                   
+
+                                                        {sidebar.name === "New Post" ? (<Link href="/NewPost" className="w-full hover:text-foreground" prefetch>{sidebar.name} </Link>) : (<div> {sidebar.name} </div>)}
+                                                 
                                                 </motion.div>
                                             </SidebarMenuButton>
                                         </SidebarMenuItem>
@@ -194,11 +197,13 @@ export default function SidebarDashboard() {
                     </SidebarContent>
                 </Sidebar >
             </div>
-            <div className="">
+            {/* <div className="">
                 {isNewPostOpen === "New Post" && (
+
                     <NewPostButton />
+
                 )}
-            </div>
+            </div> */}
         </div>
     )
 }
