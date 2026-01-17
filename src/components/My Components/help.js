@@ -1,133 +1,15 @@
-"use client";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useState } from "react";
-import { Button } from "../ui/button";
-import { Search, XIcon } from "lucide-react";
-import Image from "next/image";
-import { Input } from "../ui/input";
-import { AnimatePresence, motion } from "framer-motion";
-import Blogging from "./Blogging";
-
-
-export default function Header() {
-
-    const [activeLink, setActiveLink] = useState<string | null>(null);
-
-    const [searchOpen, setSearchOpen] = useState(false);
-    const links = [
-        { name: "Projects", href: "/projects" },
-        { name: "Art", href: "/art" },
-        { name: "About Me", href: "/aboutme" }
-    ]
-
-
-
-
-    return (
-
-        <>
-            <div className="flex justify-start flex-col p-4 sticky top-0 z-50 bg-background/80 backdrop-blur-2xl">
-                <div className="max-w-6xl w-full justify-between flex">
-
-                    <div className="max-w-xl w-full justify-between flex relative left-[25%]">
-                        <Link href="/" onClick={() => setActiveLink("Piyush Yadav")} className={cn(
-                            "text-xl font-semibold italic hover:text-secondary-foreground", activeLink === "Piyush Yadav" ? "text-color-primary" : "text-primary"
-                        )}>
-                            <div className="text-xl cursor-pointer ">
-                                Piyush Yadav
-
-                            </div>
-                        </Link>
-                        <div className="flex gap-6 ">
-                            {links.map(link => (
-                                <Link key={link.name} href={link.href} onClick={() => setActiveLink(link.name)}
-                                    className={cn(
-                                        "text-lg hover:text-secondary-foreground", activeLink === link.name ? "text-primary" : "text"
-                                    )}>
-                                    {link.name}
-
-                                </Link>
-                            ))}
-
-
-
-                        </div>
-
-                    </div>
-
-                    <div className="flex gap-4 mt-1 justify-end">
-
-                        <Search className="w-5 h-5 cursor-pointer hover:animate-bounce transition duration-200"
-                            onClick={() => setSearchOpen(true)} />
-
-                    </div>
-                </div>
-            </div>
-
-
-
-
-            <AnimatePresence>
-                {searchOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -50 }}
-                        transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-[60] flex items-start bg-background/70 backdrop-blur-md w-full"
-                    >
-
-
-                        <Image
-                            src="/waves1.png"
-                            alt="Search"
-                            className="w-full h-[60vh] object-cover"
-                            width={1920}
-                            height={1080}
-                        />
-
-                        <div className="absolute inset-0 flex flex-col items-center w-full p-4">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.1, duration: 0.3 }}
-                                className="relative"
-                            >
-                                <Search className="absolute left-0 top-1/2 ml-2 pl-1 transform -translate-y-1/2 h-5 w-5 text-primary-foreground pointer-events-none" />
-                                <Input
-                                    type="text"
-                                    placeholder="Searching something "
-                                    className="px-4 py-2 p-2 w-160 pl-10 border-0 border-b-2
-                                border-gray-800 focus:border-primary focus:outline-none transition placeholder-gray-400 shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent rounded-none" />
-                            </motion.div>
-
-
-
-
-                            <button
-                                className="absolute top-4 right-5 hover:opacity-70 transition duration-200"
-                                onClick={() => setSearchOpen(false)}
-                            >
-                                <XIcon className="w-6 h-6 cursor-pointer" />
-                            </button>
-
-                            <motion.div initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.2, duration: 0.3 }} className="italic max-w-xl  text-center mt-2 p-1">
-                                Search through all of the blog posts and snippets on my site. This Project is in beta . If you run into any bugs, <Link href={"/Contact"} className="underline"> please let me know!</Link>
-
-                            </motion.div>
-                        </div>
-
-                    </motion.div >
-
-
-                )
-                }
-            </AnimatePresence>
-        </>
-    )
-
-
-}
+import{jsx as _jsx}from"react/jsx-runtime";import*as React from"react";import{Frame,addPropertyControls,ControlType}from"framer";import{motion,AnimatePresence}from"framer-motion";import{SettingsMessage}from"https://framer.com/m/Utils-QTIc.js@hDBsItohjMEOACix8wDv";// Custom hook for preloading images
+function useImagePreloader(imageUrls){const[imagesPreloaded,setImagesPreloaded]=React.useState(false);React.useEffect(()=>{let isMounted=true;const preloadImages=async()=>{const imagePromises=imageUrls.map(url=>{return new Promise((resolve,reject)=>{const img=new Image;img.src=url;img.onload=resolve;img.onerror=reject;});});try{await Promise.all(imagePromises);if(isMounted){setImagesPreloaded(true);}}catch(error){console.error("Failed to preload images:",error);}};preloadImages();return()=>{isMounted=false;};},[imageUrls]);return imagesPreloaded;}/**
+ * @framerIntrinsicWidth 400
+ * @framerIntrinsicHeight 200
+ *
+ * @framerDisableUnlink
+ *
+ * @framerSupportedLayoutWidth fixed
+ * @framerSupportedLayoutHeight fixed
+ */export default function CursorImageTrail({images=[],style={width:100,height:100,radius:0,fit:"fill"},frequency=50,visibleFor=1,perspective={enabled:false,value:1e3},animation={in:{from:{opacity:0,scale:.5,blur:8,is3D:"2D",rotate2D:0,rotate3D:{x:0,y:0,z:0}},to:{opacity:1,scale:1,blur:0,is3D:"2D",rotate2D:0,rotate3D:{x:0,y:0,z:0}},transition:{type:"spring",stiffness:300,damping:30}},out:{opacity:0,scale:.5,blur:8,is3D:"2D",rotate2D:0,rotate3D:{x:0,y:0,z:0},transition:{type:"spring",stiffness:300,damping:30}}},...props}){const threshold=200-(frequency-1)*199/49;const[mousePos,setMousePos]=React.useState({x:0,y:0});const[isHovering,setIsHovering]=React.useState(false);const[currentImageIndex,setCurrentImageIndex]=React.useState(0);const[activeImages,setActiveImages]=React.useState([]);const[isInViewport,setIsInViewport]=React.useState(false);const componentRef=React.useRef(null);const imagesPreloaded=useImagePreloader(isInViewport?images:[]);React.useEffect(()=>{const observer=new IntersectionObserver(([entry])=>{setIsInViewport(entry.isIntersecting);},{root:null,rootMargin:"0px",threshold:.1});if(componentRef.current){observer.observe(componentRef.current);}return()=>{if(componentRef.current){observer.unobserve(componentRef.current);}};},[]);const handleMouseMove=event=>{const rect=event.currentTarget.getBoundingClientRect();const x=event.clientX-rect.left;const y=event.clientY-rect.top;setMousePos({x,y});};const handleMouseEnter=()=>{setIsHovering(true);};const handleMouseLeave=()=>{setIsHovering(false);};React.useEffect(()=>{if(isHovering&&images.length>0){const lastImage=activeImages[activeImages.length-1];const distance=lastImage?Math.hypot(mousePos.x-lastImage.x,mousePos.y-lastImage.y):Infinity;if(distance>threshold){const newImage={id:Math.random(),position:currentImageIndex,x:mousePos.x,y:mousePos.y,createdAt:Date.now(),state:"entering"};setActiveImages(prev=>[...prev,newImage]);setCurrentImageIndex(prev=>(prev+1)%images.length);// Schedule exit animation
+setTimeout(()=>{setActiveImages(prev=>prev.map(img=>img.id===newImage.id?{...img,state:"exiting"}:img));},visibleFor*1e3);// Schedule removal from DOM
+setTimeout(()=>{setActiveImages(prev=>prev.filter(img=>img.id!==newImage.id));},1e4)// 10 seconds
+;}}},[mousePos,isHovering,images,threshold,currentImageIndex,visibleFor]);if(images.length===0){return /*#__PURE__*/_jsx(SettingsMessage,{title:"Set Up the Component",description:"Add images to the component through the 'Images' property on the right panel. Then preview the website, and hover over the component.",containerStyle:{...props.style,width:"100%",height:"100%"}});}return /*#__PURE__*/_jsx(Frame,{...props,ref:componentRef,onMouseMove:handleMouseMove,onMouseEnter:handleMouseEnter,onMouseLeave:handleMouseLeave,background:"",children:imagesPreloaded&&/*#__PURE__*/_jsx(AnimatePresence,{children:activeImages.map(({id,position,x,y,state})=>/*#__PURE__*/{var _images_position;return _jsx(motion.div,{initial:{opacity:animation.in.from.opacity,scale:animation.in.from.scale,filter:`blur(${animation.in.from.blur}px)`,x:x-style.width/2,y:y-style.height/2,rotate:animation.in.from.is3D==="2D"?animation.in.from.rotate2D:0,rotateX:animation.in.from.is3D==="3D"?animation.in.from.rotate3D.x:0,rotateY:animation.in.from.is3D==="3D"?animation.in.from.rotate3D.y:0,rotateZ:animation.in.from.is3D==="3D"?animation.in.from.rotate3D.z:0},animate:state==="entering"?{opacity:animation.in.to.opacity,scale:animation.in.to.scale,filter:`blur(${animation.in.to.blur}px)`,x:x-style.width/2,y:y-style.height/2,rotate:animation.in.to.is3D==="2D"?animation.in.to.rotate2D:0,rotateX:animation.in.to.is3D==="3D"?animation.in.to.rotate3D.x:0,rotateY:animation.in.to.is3D==="3D"?animation.in.to.rotate3D.y:0,rotateZ:animation.in.to.is3D==="3D"?animation.in.to.rotate3D.z:0}:{opacity:animation.out.opacity,scale:animation.out.scale,filter:`blur(${animation.out.blur}px)`,x:x-style.width/2,y:y-style.height/2,rotate:animation.out.is3D==="2D"?animation.out.rotate2D:0,rotateX:animation.out.is3D==="3D"?animation.out.rotate3D.x:0,rotateY:animation.out.is3D==="3D"?animation.out.rotate3D.y:0,rotateZ:animation.out.is3D==="3D"?animation.out.rotate3D.z:0},transition:state==="entering"?animation.in.transition:animation.out.transition,style:{position:"absolute",width:`${style.width}px`,height:`${style.height}px`,backgroundImage:`url(${(_images_position=images[position])!==null&&_images_position!==void 0?_images_position:""})`,backgroundSize:style.fit==="fill"?"cover":"contain",backgroundPosition:"center",backgroundRepeat:"no-repeat",borderRadius:`${style.radius}px`,pointerEvents:"none",perspective:perspective.enabled?`${perspective.value}px`:"none"}},id);})})});}CursorImageTrail.displayName="Cursor Image Trail";addPropertyControls(CursorImageTrail,{images:{type:ControlType.Array,title:"Images",propertyControl:{type:ControlType.Image}},style:{type:ControlType.Object,title:"Style",controls:{width:{type:ControlType.Number,title:"Width",defaultValue:100,min:0,max:1e3,unit:"px",step:1,displayStepper:true},height:{type:ControlType.Number,title:"Height",defaultValue:100,min:0,max:1e3,unit:"px",step:1,displayStepper:true},radius:{type:ControlType.Number,title:"Radius",defaultValue:0,min:0,max:500,unit:"px",step:1,displayStepper:true},fit:{type:ControlType.Enum,title:"Type",options:["fill","fit"],optionTitles:["Fill","Fit"],defaultValue:"fill",description:"Style the images that will appear."}}},frequency:{type:ControlType.Number,title:"Frequency",defaultValue:35,min:1,max:50,step:1,displayStepper:false,description:"How frequently these images appear."},visibleFor:{type:ControlType.Number,title:"Visible For",defaultValue:1,min:.1,max:10,step:.1,unit:"s",displayStepper:true,description:"How long they're visible for before they animate out."},animation:{type:ControlType.Object,title:"Animation",controls:{in:{type:ControlType.Object,title:"In",controls:{from:{type:ControlType.Object,title:"From",controls:{opacity:{type:ControlType.Number,title:"Opacity",defaultValue:0,min:0,max:1,step:.1},scale:{type:ControlType.Number,title:"Scale",defaultValue:.5,min:0,max:10,step:.1},blur:{type:ControlType.Number,title:"Blur",defaultValue:10,min:0,max:50,step:1,unit:"px"},is3D:{type:ControlType.Enum,title:"Rotation",options:["2D","3D"],optionTitles:["2D","3D"],defaultValue:"2D",displaySegmentedControl:true},rotate2D:{type:ControlType.Number,title:"2D Rotate",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0",hidden:props=>props.is3D==="3D"},rotate3D:{type:ControlType.Object,title:"3D Rotate",controls:{x:{type:ControlType.Number,title:"X",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"},y:{type:ControlType.Number,title:"Y",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"},z:{type:ControlType.Number,title:"Z",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"}},hidden:props=>props.is3D==="2D"}}},to:{type:ControlType.Object,title:"To",controls:{opacity:{type:ControlType.Number,title:"Opacity",defaultValue:1,min:0,max:1,step:.1},scale:{type:ControlType.Number,title:"Scale",defaultValue:1,min:0,max:10,step:.1},blur:{type:ControlType.Number,title:"Blur",defaultValue:0,min:0,max:50,step:1,unit:"px"},is3D:{type:ControlType.Enum,title:"Rotation",options:["2D","3D"],optionTitles:["2D","3D"],defaultValue:"2D",displaySegmentedControl:true},rotate2D:{type:ControlType.Number,title:"2D Rotate",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0",hidden:props=>props.is3D==="3D"},rotate3D:{type:ControlType.Object,title:"3D Rotate",controls:{x:{type:ControlType.Number,title:"X",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"},y:{type:ControlType.Number,title:"Y",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"},z:{type:ControlType.Number,title:"Z",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"}},hidden:props=>props.is3D==="2D"}}},transition:{type:ControlType.Transition,title:"Transition"}}},out:{type:ControlType.Object,title:"Out",controls:{opacity:{type:ControlType.Number,title:"Opacity",defaultValue:0,min:0,max:1,step:.1},scale:{type:ControlType.Number,title:"Scale",defaultValue:.5,min:0,max:10,step:.1},blur:{type:ControlType.Number,title:"Blur",defaultValue:10,min:0,max:50,step:1,unit:"px"},is3D:{type:ControlType.Enum,title:"Rotation",options:["2D","3D"],optionTitles:["2D","3D"],defaultValue:"2D",displaySegmentedControl:true},rotate2D:{type:ControlType.Number,title:"2D Rotate",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0",hidden:props=>props.is3D==="3D"},rotate3D:{type:ControlType.Object,title:"3D Rotate",controls:{x:{type:ControlType.Number,title:"X",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"},y:{type:ControlType.Number,title:"Y",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"},z:{type:ControlType.Number,title:"Z",defaultValue:0,min:-360,max:360,step:1,unit:"\xb0"}},hidden:props=>props.is3D==="2D"},transition:{type:ControlType.Transition,title:"Transition"}}}}},perspective:{type:ControlType.Object,title:"Perspective",description:"More components at [Framer University](https://frameruni.link/cc).",controls:{enabled:{type:ControlType.Boolean,title:"Enable",defaultValue:false},value:{type:ControlType.Number,title:"Value",defaultValue:1200,min:500,max:5e3,step:10,displayStepper:true,hidden:props=>!props.enabled}}}});
+export const __FramerMetadata__ = {"exports":{"default":{"type":"reactComponent","name":"CursorImageTrail","slots":[],"annotations":{"framerSupportedLayoutHeight":"fixed","framerSupportedLayoutWidth":"fixed","framerDisableUnlink":"*","framerIntrinsicHeight":"200","framerContractVersion":"1","framerIntrinsicWidth":"400"}},"__FramerMetadata__":{"type":"variable"}}}
+//# sourceMappingURL=./CursorImageTrail_Prod.map
