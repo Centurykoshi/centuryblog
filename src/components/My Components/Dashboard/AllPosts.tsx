@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { PostStatus } from "@/generated/prisma";
 import FilterPostComponent from "../Posts Components/FilterComponent";
 import { useSearchParams } from "next/navigation";
+import GobackButton from "../GoBackButton";
 
 
 type Posts = {
@@ -78,7 +79,7 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
             await UpdateDocumentSatus.mutateAsync({
                 id: post.id,
                 status: pendingStatus,
-                
+
             });
 
             setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: pendingStatus } : p));
@@ -128,6 +129,9 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
 
     return (
         <div>
+            <span className=" absolute top-10 left-1/5">
+                <GobackButton value={null} />
+            </span>
 
             <motion.div
                 initial={{ y: 0, opacity: 0 }} animate={{ y: 0, opacity: 1 }}

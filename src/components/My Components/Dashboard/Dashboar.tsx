@@ -1,3 +1,5 @@
+"use client";
+
 import EditingPage from "./EditingPage";
 import SidebarDashboard from "./Sidebar";
 

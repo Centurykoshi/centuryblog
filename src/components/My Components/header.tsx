@@ -74,10 +74,10 @@ export default function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
                         transition={{ duration: 0.3 }}
-                        className={`absolute flex top-0 h-[60vh] bg-transparent border-none shadow-none w-full `}>
+                        className="fixed inset-0 flex z-80 top-0 h-[60vh] bg-background/70 border-none shadow-none w-full ">
 
 
-                        <Image src="/waves1.png" alt="Search" className="w-full" width={1920} height={1080} />
+                        <Image src="/waves1.png" alt="Search" className="w-full " width={1920} height={1080} />
 
                         <div className="absolute inset-0 flex  flex-col items-center w-full p-4">
                             <motion.div

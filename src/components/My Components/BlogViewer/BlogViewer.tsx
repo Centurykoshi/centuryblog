@@ -4,6 +4,7 @@ import { useTRPC } from "@/trpc/client";
 import Image from "next/image";
 import { useState } from "react";
 import styles from "./BlogRender.module.css"
+import GobackButton from "../GoBackButton";
 
 
 
@@ -79,7 +80,7 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
 
         if (node.type === "heading") {
             return (
-                <h2 className="text-3xl font-semibold mt-10 mb-4 text-primary-foreground">
+                <h2 className="text-3xl  font-serif font-semibold mt-10 mb-4 text-primary-foreground">
                     {node.content?.map((t: any) => t.text).join("")}
 
                 </h2>
@@ -157,8 +158,10 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
                         className="absolute inset-0 w-full h-full"
                     />
                     <div className="absolute inset-0 bg-white/40 "></div>
+                    <div className="absolute inset-0 top-10 left-1/10 "><GobackButton value={"Go Back "} />
+                    </div>
                     <div className="relative z-10 text-sm font-medium p-5 mb-6">{DatePublished}</div>
-                    <div className="relative z-10 text-6xl mb-10 p-4 max-w-226  text-primary-foreground text-center font-semibold px-4">
+                    <div className="relative z-10 text-6xl mb-10 p-4 font-serif max-w-226  text-primary-foreground text-center font-semibold px-4">
                         {blogdetail.title}
 
                     </div>
