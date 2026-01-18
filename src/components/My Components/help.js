@@ -1,151 +1,83 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
-interface TrailImage {
-    id: number;
-    position: number;
-    x: number;
-    y: number;
-    createdAt: number;
-    state: "entering" | "exiting";
+import Image from "next/image";
+import { useState } from "react";
+import CursorImageTrail from "./CursorImageTrail";
+import Link from "next/link";
+
+type ImageDetails = {
+    featuredImg: string;
+    slug: string;
 }
 
-interface CursorImageTrailProps {
-    images: { featuredImg: string; slug: string }[];
-    frequency?: number;
-    visibleFor?: number;
-    width?: number;
-    height?: number;
-    radius?: number;
-    link?: string;
-}
 
-export default function CursorImageTrail({
-    images = [],
-    frequency = 35,
-    visibleFor = 1,
-    width = 100,
-    height = 100,
-    radius = 0,
-}: CursorImageTrailProps) {
-    const threshold = 200 - (frequency - 1) * 199 / 49;
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [isHovering, setIsHovering] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [activeImages, setActiveImages] = useState<TrailImage[]>([]);
-    const componentRef = useRef<HTMLDivElement>(null);
 
-    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        setMousePos({ x, y });
-    };
 
-    useEffect(() => {
-        if (isHovering && images.length > 0) {
-            const lastImage = activeImages[activeImages.length - 1];
-            const distance = lastImage
-                ? Math.hypot(mousePos.x - lastImage.x, mousePos.y - lastImage.y)
-                : Infinity;
 
-            if (distance > threshold) {
-                const newImage: TrailImage = {
-                    id: Math.random(),
-                    position: currentImageIndex,
-                    x: mousePos.x,
-                    y: mousePos.y,
-                    createdAt: Date.now(),
-                    state: "entering",
-                };
 
-                setActiveImages((prev) => [...prev, newImage]);
-                setCurrentImageIndex((prev) => (prev + 1) % images.length);
 
-                // Schedule exit animation
-                setTimeout(() => {
-                    setActiveImages((prev) =>
-                        prev.map((img) =>
-                            img.id === newImage.id ? { ...img, state: "exiting" } : img
-                        )
-                    );
-                }, visibleFor * 1000);
 
-                // Schedule removal from DOM
-                setTimeout(() => {
-                    setActiveImages((prev) =>
-                        prev.filter((img) => img.id !== newImage.id)
-                    );
-                }, 10000);
-            }
-        }
-    }, [mousePos, isHovering, images, threshold, currentImageIndex, visibleFor]);
 
-    if (images.length === 0) {
-        return <div className="text-muted-foreground">No images provided</div>;
+export default function Model({ ImageDetailsP }: { ImageDetailsP: ImageDetails[] }) {
+
+    const generaterandomImages = (images: ImageDetails[], max = 5) => {
+
+        const shuffled = [...images].sort(() => 0.5 - Math.random())
+        return shuffled.slice(0, Math.min(max, images.length));
+
     }
 
+
+    const [hovered, setIsHoveredset] = useState(true);
+
+    const imagesUrls = ImageDetailsP.map(p => ({
+        featuredImg: encodeURI(p.featuredImg),
+        slug: p.slug
+    }));
+
+    console.log(imagesUrls);
+    const randomImages = generaterandomImages(imagesUrls, 5);
+
+    const [isHovered, setIsHovered] = useState(false);
     return (
-        <div
-            ref={componentRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            className="relative w-full min-h-96"
-        >
-            <AnimatePresence>
-                {activeImages.map(({ id, position, x, y, state }) => (
-                    <motion.a
-                        key={id}
-                        href={`/Blog/${images[position].slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        initial={{
-                            opacity: 0,
-                            scale: 0.5,
-                            filter: "blur(0px)",
-                            x: x - width / 2,
-                            y: y - height / 2,
-                        }}
-                        animate={
-                            state === "entering"
-                                ? {
-                                    opacity: 1,
-                                    scale: 1,
-                                    filter: "blur(0px)",
-                                    x: x - width / 2,
-                                    y: y - height / 2,
-                                }
-                                : {
-                                    opacity: 0,
-                                    scale: 0.5,
-                                    filter: "blur(0px)",
-                                    x: x - width / 2,
-                                    y: y - height / 2,
-                                }
-                        }
-                        transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30,
-                        }}
-                        className="cursor-pointer absolute top-0 left-0 z-10 block"
-                        style={{
-                            width: `${width}px`,
-                            height: `${height}px`,
-                            backgroundImage: `url(${images[position].featuredImg})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            borderRadius: `${radius}px`,
-                        }}
-                    >
-                        <div className="absolute inset-0 bg-primary/50 rounded-lg" />
-                    </motion.a>
-                ))}
+        <>
+            <div className="flex justify-between p-4 relative ">
+                <div className="w-full ml-10 cursor-pointer relative"
+                    onMouseEnter={() => setIsHoveredset(false)} 
+                    onMouseLeave={() => setIsHoveredset(true)}>
 
 
-            </AnimatePresence>
-        </div>
-    );
+                    <CursorImageTrail images={randomImages}
+                        frequency={20}
+                        visibleFor={1.5}
+                        width={180}
+                        height={180}
+                        radius={8}
+
+                    />
+
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="relative bg-transparent top-1/2 left-1/3 text-5xl text-primary">
+
+                        {hovered ? "Hover Here" : ""}
+
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <img alt="model" width={400} height={400} className="rounded-md opacity-45 hover:opacity-100 transition-opacity duration-300"
+                    onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
+
+                    src={isHovered ? "model.gif" : "modelstatic.png"}
+
+                />
+
+
+
+            </div>
+        </>
+    )
 }

@@ -37,7 +37,11 @@ export default async function Frontpage() {
 
     })
 
-
+    // Only pass required data to Model component
+    const imageData = BlogDetails.map(blog => ({
+        featuredImg: blog.featuredImg,
+        slug: blog.slug
+    }));
 
 
 
@@ -45,7 +49,7 @@ export default async function Frontpage() {
         <>
 
             <Header />
-            <Model ImageDetailsP={BlogDetails} />
+            <Model ImageDetailsP={imageData} />
             <Blogging initialDetails={BlogDetails} />
             <Footer />
 

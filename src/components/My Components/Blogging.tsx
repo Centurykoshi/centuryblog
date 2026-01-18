@@ -131,7 +131,7 @@ export default function Blogging({ initialDetails }: { initialDetails: Details[]
                                                 <ArrowRight className="w-6 h-6 inline mb-2 mr-2 transition-all duration-300 group-hover:translate-x-2 " />
                                             </motion.div>
                                             <span className="inline text-xl font-semibold cursor-pointer ">
-                                                {blog.title}
+                                                {blog.title.slice(0, 60) + "..."}
                                             </span>
                                         </Link>
                                     ))}
