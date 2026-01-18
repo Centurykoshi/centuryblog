@@ -143,7 +143,7 @@ export default function CursorImageTrail({
 
 
                     >
-                        <div className="absolute inset-0 bg-primary/50 rounded-lg" />
+                        <div className="absolute inset-0 bg-primary/30 rounded-lg" />
 
                     </motion.a>
 
