@@ -12,12 +12,13 @@ interface TrailImage {
 }
 
 interface CursorImageTrailProps {
-    images: string[];
+    images: { featuredImg: string; slug: string }[];
     frequency?: number;
     visibleFor?: number;
     width?: number;
     height?: number;
     radius?: number;
+    link?: string;
 }
 
 export default function CursorImageTrail({
@@ -95,8 +96,11 @@ export default function CursorImageTrail({
         >
             <AnimatePresence>
                 {activeImages.map(({ id, position, x, y, state }) => (
-                    <motion.div
+                    <motion.a
                         key={id}
+                        href={`/Blog/${images[position].slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         initial={{
                             opacity: 0,
                             scale: 0.5,
@@ -104,6 +108,7 @@ export default function CursorImageTrail({
                             x: x - width / 2,
                             y: y - height / 2,
                         }}
+
                         animate={
                             state === "entering"
                                 ? {
@@ -116,21 +121,21 @@ export default function CursorImageTrail({
                                 : {
                                     opacity: 0,
                                     scale: 0.5,
-                                    filter: "blur(8px)",
+                                    filter: "blur(0px)",
                                     x: x - width / 2,
                                     y: y - height / 2,
                                 }
                         }
                         transition={{
                             type: "spring",
-                            stiffness: 300,
+                            stiffness: 500,
                             damping: 30,
                         }}
-                        className="pointer-events-none absolute top-0 left-0 z-10"
+                        className=" absolute top-0 left-0 z-10"
                         style={{
                             width: `${width}px`,
                             height: `${height}px`,
-                            backgroundImage: `url(${images[position]})`,
+                            backgroundImage: `url(${images[position].featuredImg})`,
                             backgroundSize: "cover",
                             backgroundPosition: "center",
                             borderRadius: `${radius}px`,
@@ -140,7 +145,7 @@ export default function CursorImageTrail({
                     >
                         <div className="absolute inset-0 bg-primary/50 rounded-lg" />
 
-                    </motion.div>
+                    </motion.a>
 
 
                 ))}

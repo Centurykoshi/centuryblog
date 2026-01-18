@@ -28,6 +28,7 @@ export default async function Frontpage() {
             contentHTML: true,
             contentJSON: true,
             excerpt: true,
+            featuredImg: true,
         },
 
         orderBy: {
@@ -44,7 +45,7 @@ export default async function Frontpage() {
         <>
 
             <Header />
-            <Model />
+            <Model ImageDetailsP={BlogDetails} />
             <Blogging initialDetails={BlogDetails} />
             <Footer />
 
