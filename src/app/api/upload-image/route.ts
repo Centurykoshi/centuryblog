@@ -2,6 +2,14 @@ import { writeFile, mkdir, unlink } from "fs/promises";
 import { NextResponse } from "next/server";
 import path from "path";
 import { existsSync } from "fs";
+import { v2 as cloudinary } from "cloudinary";
+import { error } from "console";
+
+cloudinary.config({
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function POST(request: Request) {
     try {
@@ -21,7 +29,7 @@ export async function POST(request: Request) {
 
         console.log("File Details : ", {
             name: file.name,
-            size: file.size,
+            size: file.size / 8,
             type: file.type
         })
 
@@ -30,30 +38,33 @@ export async function POST(request: Request) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        const timestamp = Date.now();
-        const fileName = `${timestamp}-${file.name}`;
-        const randomstring = Math.random().toString(36).substring(2, 8);
-        // here we are just giving it address so it can use it, we are not uploading the file here
 
 
-        const uploadsDir = path.join(process.cwd(), "public", "uploads", "images");
 
-        // Ensure the uploads directory exists
-        if (!existsSync(uploadsDir)) {
-            await mkdir(uploadsDir, { recursive: true });
-        }
 
-        //eg : /home/piyush/my-next-app/public/uploads/images/17045592123-abcd123.png
-        const filePath = path.join(uploadsDir, fileName);
+        const uploadedResponse = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    folder: "centuryblog/uploads",
+                    resource_type: "image",
+                    quality: "auto",
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(buffer);
+        });
 
-        await writeFile(filePath, buffer);
 
-        const fileUrl = `/uploads/images/${fileName}`;
+        const result = uploadedResponse as any;
+
+
 
         return NextResponse.json({
             success: true,
-            url: fileUrl,
-            fileName: fileName,
+            url: result.secure_url,
+            fileName: result.public_id,
             size: file.size,
             type: file.type,
             message: "File uploaded successfully",
@@ -81,15 +92,10 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ success: false, message: "File name is required" }, { status: 400 });
         }
 
-        const filePath = path.join(process.cwd(), "public", "uploads", "images", fileName);
+        await cloudinary.uploader.destroy(fileName);
 
-        if (!existsSync(filePath)) {
-            return NextResponse.json({ success: false, message: "File does not exist" }, { status: 404 });
-        }
+        console.log("This file has be deleted : " + { fileName })
 
-        await unlink(filePath);
-
-        console.log(`File deleted: ${fileName}`);
 
         return NextResponse.json({ success: true, message: "File deleted successfully" }, { status: 200 });
 
