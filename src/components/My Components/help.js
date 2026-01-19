@@ -1,83 +1,93 @@
-"use client";
+import { NextResponse } from "next/server";
+import { v2 as cloudinary } from "cloudinary";
 
-import Image from "next/image";
-import { useState } from "react";
-import CursorImageTrail from "./CursorImageTrail";
-import Link from "next/link";
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-type ImageDetails = {
-    featuredImg: string;
-    slug: string;
+export async function POST(request: Request) {
+    try {
+        const formdata = await request.formData();
+        const file = formdata.get("file") as File;
+
+        if (!file) {
+            console.log("No file uploaded");
+            return NextResponse.json({ success: false, message: "No file uploaded" }, { status: 400 });
+        }
+
+        if (!file.type.startsWith("image/")) {
+            return NextResponse.json({ success: false, message: "Invalid file type. Only images are allowed." }, { status: 400 });
+        }
+
+        console.log("File Details : ", {
+            name: file.name,
+            size: file.size,
+            type: file.type
+        });
+
+        // Convert file to buffer
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Upload to Cloudinary
+        const uploadResponse = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    folder: "centuryblog/uploads",
+                    resource_type: "image",
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(buffer);
+        });
+
+        const result = uploadResponse as any;
+
+        return NextResponse.json({
+            success: true,
+            url: result.secure_url,
+            fileName: result.public_id,
+            size: file.size,
+            type: file.type,
+            message: "File uploaded successfully",
+        }, {
+            status: 200
+        });
+
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        return NextResponse.json({ success: false, message: "Error uploading file" }, { status: 500 });
+    }
 }
 
 
+export async function DELETE(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const fileName = searchParams.get("fileName");
 
+        if (!fileName) {
+            return NextResponse.json({ success: false, message: "File name is required" }, { status: 400 });
+        }
 
+        // Delete from Cloudinary using public_id
+        await cloudinary.uploader.destroy(fileName);
 
+        console.log(`File deleted from Cloudinary: ${fileName}`);
 
+        return NextResponse.json({ success: true, message: "File deleted successfully" }, { status: 200 });
 
-
-
-export default function Model({ ImageDetailsP }: { ImageDetailsP: ImageDetails[] }) {
-
-    const generaterandomImages = (images: ImageDetails[], max = 5) => {
-
-        const shuffled = [...images].sort(() => 0.5 - Math.random())
-        return shuffled.slice(0, Math.min(max, images.length));
-
+    } catch (error) {
+        console.error("Error deleting file: ", error);
+        return NextResponse.json({
+            success: false,
+            message: "Error deleting file"
+        }, { status: 500 });
     }
 
-
-    const [hovered, setIsHoveredset] = useState(true);
-
-    const imagesUrls = ImageDetailsP.map(p => ({
-        featuredImg: encodeURI(p.featuredImg),
-        slug: p.slug
-    }));
-
-    console.log(imagesUrls);
-    const randomImages = generaterandomImages(imagesUrls, 5);
-
-    const [isHovered, setIsHovered] = useState(false);
-    return (
-        <>
-            <div className="flex justify-between p-4 relative ">
-                <div className="w-full ml-10 cursor-pointer relative"
-                    onMouseEnter={() => setIsHoveredset(false)} 
-                    onMouseLeave={() => setIsHoveredset(true)}>
-
-
-                    <CursorImageTrail images={randomImages}
-                        frequency={20}
-                        visibleFor={1.5}
-                        width={180}
-                        height={180}
-                        radius={8}
-
-                    />
-
-                    <div className="absolute inset-0 pointer-events-none">
-                        <div className="relative bg-transparent top-1/2 left-1/3 text-5xl text-primary">
-
-                        {hovered ? "Hover Here" : ""}
-
-
-
-                        </div>
-
-                    </div>
-
-                </div>
-                <img alt="model" width={400} height={400} className="rounded-md opacity-45 hover:opacity-100 transition-opacity duration-300"
-                    onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
-
-                    src={isHovered ? "model.gif" : "modelstatic.png"}
-
-                />
-
-
-
-            </div>
-        </>
-    )
 }
