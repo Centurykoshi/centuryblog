@@ -158,7 +158,7 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
                         className="absolute inset-0 w-full h-full"
                     />
                     <div className="absolute inset-0 bg-white/40 "></div>
-                    <div className="absolute inset-0 top-10 left-1/10 "><GobackButton value={"Go Back "} />
+                    <div className="absolute inset-0 top-10 left-1/10 "><GobackButton Prop={{ value: "Go Back", url: "/" }} />
                     </div>
                     <div className="relative z-10 text-sm font-medium p-5 mb-6">{DatePublished}</div>
                     <div className="relative z-10 text-6xl mb-10 p-4 font-serif max-w-226  text-primary-foreground text-center font-semibold px-4">
