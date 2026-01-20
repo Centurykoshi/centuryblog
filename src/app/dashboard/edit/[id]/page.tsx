@@ -7,7 +7,7 @@ export default function EditPage() {
     return (
         <>
 
-            <Navbar />
+        
             <SimpleEditor />
         </>
     )

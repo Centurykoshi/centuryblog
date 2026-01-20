@@ -81,6 +81,7 @@ import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
 import TagsSelection from "./TagsSeletion"
+import GobackButton from "@/components/My Components/GoBackButton"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -243,6 +244,15 @@ export function SimpleEditor() {
   const [isRepositioning, setIsRepositioning] = useState<boolean>(false)
   const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const titleTextareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Auto-resize textarea
+  const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTitle(e.target.value)
+    const textarea = e.target
+    textarea.style.height = 'auto'
+    textarea.style.height = textarea.scrollHeight + 'px'
+  }
 
   // Initialize editor first
   const editor = useEditor({
@@ -369,6 +379,13 @@ export function SimpleEditor() {
         // Load title
         if (documentData.document.title) {
           setTitle(documentData.document.title);
+          // Auto-resize textarea after loading
+          setTimeout(() => {
+            if (titleTextareaRef.current) {
+              titleTextareaRef.current.style.height = 'auto'
+              titleTextareaRef.current.style.height = titleTextareaRef.current.scrollHeight + 'px'
+            }
+          }, 0)
         }
 
         // Load featured image
@@ -454,7 +471,7 @@ export function SimpleEditor() {
     } catch (error) {
       console.error('Save failed:', error)
     }
-  }, [editor, id, updateDocumentMutation, title, featuredImage, filter, saveStatus])
+  }, [editor, id, updateDocumentMutation, title, featuredImage, filter, saveStatus, documentData])
 
   // Add onUpdate to editor after initialization
   useEffect(() => {
@@ -534,7 +551,11 @@ export function SimpleEditor() {
   }, [saveDocument])
 
   return (
-    <div className="min-h-screen min-w-screen overflow-x-auto overflow-y-hidden flex flex-col items-center">
+    <div className="min-h-screen overflow-x-auto overflow-y-hidden flex flex-col items-center">
+
+      <div className="absolute top-5 right-[3%]">
+        <GobackButton Prop={{ value: "Go To Posts", url: "/Posts" }} />
+      </div>
       <EditorContext.Provider value={{ editor }}>
         {/* Title Section */}
 
@@ -692,12 +713,13 @@ export function SimpleEditor() {
 
         <div className=" max-w-226 w-full whitespace-normal wrap-break-word m-2  p-2  border-b-secondary border-b-2">
           <textarea
+            ref={titleTextareaRef}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={handleTitleChange}
             placeholder="Enter your article title..."
-            className="w-full border-none outline-none text-3xl font-medium text-secondary-foreground/50 resize-none overflow-hidden"
+            className="w-full border-none outline-none text-4xl font-bold text-secondary-foreground resize-none overflow-hidden"
             maxLength={200}
-            rows={2}
+            rows={1}
           />
         </div>
 

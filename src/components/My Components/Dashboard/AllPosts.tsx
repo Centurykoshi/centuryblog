@@ -130,7 +130,7 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
     return (
         <div>
             <span className=" absolute top-10 left-1/5">
-                <GobackButton value={null} />
+                <GobackButton Prop={{ value: "", url: "/" }} />
             </span>
 
             <motion.div
@@ -179,11 +179,11 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
                                                 )}
                                             </div>
                                             <div className="flex gap-2 justify-center">
-                                              
-                                                    <Button variant="outline" size="icon" className="w-8 h-8" onClick={()=>window.open(`/dashboard/edit/${post.id}`, "_blank")}>
-                                                        <Edit className="w-4 h-4" />
-                                                    </Button>
-                                    
+
+                                                <Button variant="outline" size="icon" className="w-8 h-8" onClick={() => window.open(`/dashboard/edit/${post.id}`, "_blank")}>
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
+
                                                 <Button
                                                     variant={hasChanges ? "default" : "outline"}
                                                     size="icon"
