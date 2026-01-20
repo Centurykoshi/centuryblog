@@ -1,110 +1,101 @@
-import { writeFile, mkdir, unlink } from "fs/promises";
-import { NextResponse } from "next/server";
-import path from "path";
-import { existsSync } from "fs";
-import { v2 as cloudinary } from "cloudinary";
+
 import { error } from "console";
+import { NextResponse } from "next/server";
+import { v2 as cloudinary } from 'cloudinary'
+import { resolve } from "path";
+import { success } from "zod";
 
 cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+});
 
 export async function POST(request: Request) {
+
+
     try {
-        const formdata = await request.formData();
-        const file = formdata.get("file") as File;
+
+
+        const formData = await request.formData();
+        const file = formData.get("file") as File;
+
 
         if (!file) {
-            console.log("No file uploaded");
-            return NextResponse.json({ success: false, message: "No file uploaded" }, { status: 400 });
-
+            return NextResponse.json({ error: "No File" }, { status: 400 });
         }
 
         if (!file.type.startsWith("image/")) {
-            return NextResponse.json({ success: false, message: "Invalid file type. Only images are allowed." }, { status: 400 });
+
+            return NextResponse.json({ error: "Only Images are allowed" }, { status: 400 });
 
         }
 
-        console.log("File Details : ", {
+        console.log("File Details :", {
+            size: file.size / 1024,
             name: file.name,
-            size: file.size / 8,
-            type: file.type
-        })
+            file: file.type,
+        });
 
-        // Here we are converting the file to a buffer means binary data as all the files are stored in binary format so here image to binary and storing in bytes and converting buffer to nodejs buffer
 
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
+        const cloudupload = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream({
+                folder: "CenturyBlogs/Uploads",
+                resource_type: "image",
+                quality: "auto"
 
-
-
-
-        const uploadedResponse = await new Promise((resolve, reject) => {
-            cloudinary.uploader.upload_stream(
-                {
-                    folder: "centuryblog/uploads",
-                    resource_type: "image",
-                    quality: "auto",
-                },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
+            }, (error, result) => {
+                if (error) {
+                    return reject(error);
                 }
-            ).end(buffer);
+                return resolve(result);
+            }).end(buffer);
         });
 
-
-        const result = uploadedResponse as any;
-
-
+        const result = cloudupload as any;
 
         return NextResponse.json({
             success: true,
             url: result.secure_url,
-            fileName: result.public_id,
-            size: file.size,
+            filename: result.public_id,
             type: file.type,
-            message: "File uploaded successfully",
+            size: file.size,
+            message: "File Uploaded Successfully hehe",
         }, {
-            status: 200
-        });
+            status: 200,
+        })
 
     } catch (error) {
         console.error("Error uploading file:", error);
         return NextResponse.json({ success: false, message: "Error uploading file" }, { status: 500 });
     }
 
-
 }
 
-
 export async function DELETE(request: Request) {
+
+    let filename: string | null = null;
+
     try {
-        const { searchParams } = new URL(request.url); // this lets the server know which file to delete by destructring the whole the link when user clicks on the item 
 
-        const fileName = searchParams.get("fileName");
-        // so basically we are getting thte name of the file here "sfdsafawesfsafas.png"
 
-        if (!fileName) {
-            return NextResponse.json({ success: false, message: "File name is required" }, { status: 400 });
+        const { searchParams } = new URL(request.url);
+
+        filename = searchParams.get("filename");
+
+        if (!filename) {
+            return NextResponse.json({ error: "Missing FileName" }, { status: 400 });
         }
 
-        await cloudinary.uploader.destroy(fileName);
+        await cloudinary.uploader.destroy(filename);
 
-        console.log("This file has be deleted : " + { fileName })
-
-
-        return NextResponse.json({ success: true, message: "File deleted successfully" }, { status: 200 });
-
+        return NextResponse.json({ success: true, name: filename }, { status: 200 });
     } catch (error) {
-        console.error("Error deleting file: ", error);
-        return NextResponse.json({
-            success: false,
-            message: "Getter better delete file something went wrong"
-        }, { status: 500 });
+        return NextResponse.json({ success: false, filename: filename, message: "Failed to delete file" }, { status: 400 });
     }
+
 
 }
