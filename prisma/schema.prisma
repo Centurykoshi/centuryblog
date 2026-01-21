@@ -30,6 +30,7 @@ model Document {
   published   DateTime?
   Tag         Tag        @default(All)
   Author      String? @default("Piyush")
+  Views       Int @default(1)
 
   @@index([status])
   @@index([published])

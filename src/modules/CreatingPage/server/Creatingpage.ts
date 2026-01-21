@@ -114,6 +114,28 @@ export const CreatingPage = createTRPCRouter({
         }),
 
 
+    UserBlogTracking: baseProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+
+            const UserBlogTrackingupdate = await prisma.document.update({
+                where: {
+                    id: input.id,
+                },
+
+                data: {
+                    Views: { increment: 1 },
+                }
+            })
+
+            return {
+                success: true,
+                document: UserBlogTrackingupdate,
+            }
+
+        }),
+
+
     updateDocument: baseProcedure
         .input(
             z.object({

@@ -2,9 +2,10 @@
 
 import { useTRPC } from "@/trpc/client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./BlogRender.module.css"
 import GobackButton from "../GoBackButton";
+import { useMutation } from "@tanstack/react-query";
 
 
 
@@ -17,6 +18,7 @@ type Blogs = {
     Author: string | null;
     published: Date | null;
     contentJSON: JSON;
+    Views: number;
 
 
 
@@ -29,7 +31,29 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
 
     const content = typeof blogdetail.contentJSON === "string" ? JSON.parse(blogdetail.contentJSON) : blogdetail.contentJSON;
 
+    const key = `viewed-${blogdetail.id}`;
 
+    const trpc = useTRPC();
+
+    const incremnentviews = useMutation(trpc.creating_page.UserBlogTracking.mutationOptions({}));
+
+    useEffect(() => {
+        if (!sessionStorage.getItem(key)) {
+            console.log("No session storage, incrementing views");
+            incremnentviews.mutate(
+                { id: blogdetail.id },
+                {
+                    onSuccess: () => {
+                        sessionStorage.setItem(key, "true");
+                    }
+                }
+            );
+        }
+    }, [blogdetail.id]);
+
+    console.log("Here are total views for this : " + intialBlogs.Views);
+
+    console.log("increment : " + incremnentviews);
     function groupedImages(nodes: any[]) {
         const result: any[] = [];
         let ImageGroup: string[] = [];

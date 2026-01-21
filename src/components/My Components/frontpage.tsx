@@ -29,13 +29,15 @@ export default async function Frontpage() {
             contentJSON: true,
             excerpt: true,
             featuredImg: true,
+
         },
 
         orderBy: {
             createdAt: "desc"
         }
 
-    })
+    });
+
 
     // Only pass required data to Model component
     const imageData = BlogDetails.map(blog => ({
@@ -44,13 +46,34 @@ export default async function Frontpage() {
     }));
 
 
+    const viewsData = await prisma.document.findMany({
+        where: {
+            status: "PUBLISHED",
+        },
+        select: {
+            id: true,
+            title: true,
+            slug: true,
+            Tag: true,
+            Views: true,
+        },
+        orderBy: {
+            Views: "desc"
+        },
+        take: 10,
+
+    });
+
+
+
+
 
     return (
         <>
 
             <Header />
             <Model ImageDetailsP={imageData} />
-            <Blogging initialDetails={BlogDetails} />
+            <Blogging initialDetails={BlogDetails} ViewsData={viewsData} />
             <Footer />
 
 

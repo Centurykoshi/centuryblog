@@ -2,11 +2,12 @@
 
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight, } from "lucide-react";
+
 
 type Blog = {
     id: string;
@@ -20,6 +21,8 @@ export default function BlogCard({ blog, onTitleClick }: { blog: Blog, onTitleCl
 
     const [isHovered, setIsHovered] = useState(false);
     const [isHoveredRead, setIsHoveredRead] = useState(false);
+
+
     return (
         <motion.div className="flex flex-col justify-start  max-w-xl relative">
             <div className="">
@@ -53,7 +56,7 @@ export default function BlogCard({ blog, onTitleClick }: { blog: Blog, onTitleCl
 
             </div>
 
-            <Link href={`/Blog/${blog.slug}`} className="cursor-pointer no-underline w-fit inline hover:animate-pulse text-sm font-semibold mt-2 "
+            <Link href={`/Blog/${blog.slug}`} onClick={() => { }} className="cursor-pointer no-underline w-fit inline hover:animate-pulse text-sm font-semibold mt-2 "
                 onMouseEnter={() => setIsHoveredRead(true)}
                 onMouseLeave={() => setIsHoveredRead(false)}
             >

@@ -22,9 +22,11 @@ export default async function page({ params }: { params: { slug: string } }) {
             Author: true,
             published: true,
             contentJSON: true,
+            Views: true,
 
         }
-    })
+    });
+
 
     if (!BlogDetails) {
         return <div className="absolute top-1/2 text-4xl"> Blog not found get better </div>
