@@ -15,14 +15,18 @@ type Details = {
     slug: string;
     contentHTML: string;
     Tag: "All" | "Tech" | "LifeStyle" | "Games" | "Travel";
-    excerpt : string;
-
-
-
+    excerpt: string;
 
 }
 
-export default function Blogging({ initialDetails }: { initialDetails: Details[] }) {
+type Views = {
+    id: string;
+    title: string;
+    slug: string;
+    Tag: "All" | "Tech" | "LifeStyle" | "Games" | "Travel";
+}
+
+export default function Blogging({ initialDetails, ViewsData }: { initialDetails: Details[], ViewsData: Views[] }) {
     const Category = [
         { name: "All" },
         { name: "Tech" },
@@ -40,6 +44,11 @@ export default function Blogging({ initialDetails }: { initialDetails: Details[]
     const filteredDetails = details.filter(detail => {
         if (iscategory === "All") return true;
         return detail.Tag === iscategory;
+    });
+
+    const ViewsFilteredData = ViewsData.filter(view => {
+        if (iscategory === "All") return true;
+        return view.Tag === iscategory;
     })
 
 
@@ -116,7 +125,7 @@ export default function Blogging({ initialDetails }: { initialDetails: Details[]
 
                                 <div className="flex flex-col gap-2">
 
-                                    {filteredDetails.map((blog) => (
+                                    {ViewsFilteredData.map((blog) => (
                                         <Link
                                             key={blog.id}
                                             href={`/blog/${blog.title}`}

@@ -94,7 +94,6 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
         }
     }
 
-    const queryClient = useQueryClient();
 
     const deleteConversation = useMutation(trpc.creating_page.deletepage.mutationOptions({
         onSuccess: (_, variables) => {
