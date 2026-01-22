@@ -12,7 +12,7 @@ import Blogging from "./Blogging";
 
 export default function Header() {
 
-    const [activeLink, setActiveLink] = useState<string | null>(null);
+    const [activeLink, setActiveLink] = useState<string | "Cenno">("Cenno");
 
     const [searchOpen, setSearchOpen] = useState(false);
     const links = [
@@ -27,25 +27,29 @@ export default function Header() {
     return (
 
         <>
-            <div className="flex justify-start flex-col p-4 sticky top-0 z-50 bg-background/80 backdrop-blur-2xl">
-                <div className="max-w-6xl w-full justify-between flex">
+            <motion.div initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }} className=" p-2 sticky top-0 z-50 w-full border-b border-primary/20 bg-background/85 supports-blackdrop-filter:bg-background/60 backdrop-blur">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 ">
 
-                    <div className="max-w-xl w-full justify-between flex relative left-[25%]">
-                        <Link href="/" onClick={() => setActiveLink("Piyush Yadav")} className={cn(
-                            "text-xl font-semibold italic hover:text-secondary-foreground", activeLink === "Piyush Yadav" ? "text-color-primary" : "text-primary"
+                    <div className="flex h-16 items-center justify-between">
+                        <Link href="/" onClick={() => setActiveLink("Cenno")} className={cn(
+                            "text-xl font-serif italic group hover:text-secondary-foreground transition-all hover:scale-110  duration-300", activeLink === "Cenno" ? "bg-linear-to-r from-secondary to-primary bg-clip-text text-transparent" : "text-primary"
                         )}>
-                            <div className="text-xl cursor-pointer ">
-                                Piyush Yadav
+                            <motion.div className="text-xl cursor-pointer " whileTap={{ scale: 0.95 }} >
 
-                            </div>
+                                Cenno
+
+
+                            </motion.div>
                         </Link>
-                        <div className="flex gap-6 ">
+                        <div className="hidden  md:flex items-center  gap-10 ">
                             {links.map(link => (
                                 <Link key={link.name} href={link.href} onClick={() => setActiveLink(link.name)}
                                     className={cn(
-                                        "text-lg hover:text-secondary-foreground", activeLink === link.name ? "text-primary" : "text"
+                                        "relative group font-serif hover:scale-120 transiton-all duration-300", activeLink === link.name ? "text-primary" : "text-secondary-foreground/80 "
                                     )}>
-                                    {link.name}
+                                    <motion.span className="text-lg hover:text-primary duration-300 transition-all">
+                                        {link.name}
+                                    </motion.span>
 
                                 </Link>
                             ))}
@@ -54,16 +58,25 @@ export default function Header() {
 
                         </div>
 
+
+
+                        <div className="flex gap-4 mt-1 justify-end">
+
+                            <motion.button onClick={() => setSearchOpen(true)} className="flex items-center gap-2 px-4 py-2 rounded-full  border-border-primary bg-secondary/50 hover:bg-secondary transition-colors group" whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }}>
+
+
+                                <Search className="w-4 h-4 text-secondary-foreground group-hover:rotate-360 transition-all duration-500" />
+                                <span className="hidden sm:inline text-sm text-secondary-foreground/70">Search...</span>
+
+
+                            </motion.button>
+
+
+                        </div>
                     </div>
+                </div >
+            </motion.div>
 
-                    <div className="flex gap-4 mt-1 justify-end">
-
-                        <Search className="w-5 h-5 cursor-pointer hover:animate-bounce transition duration-200"
-                            onClick={() => setSearchOpen(true)} />
-
-                    </div>
-                </div>
-            </div>
 
 
 

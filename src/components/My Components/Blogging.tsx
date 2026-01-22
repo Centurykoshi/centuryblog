@@ -98,56 +98,60 @@ export default function Blogging({ initialDetails, ViewsData }: { initialDetails
                 ))}
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 ">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                <div className="">
+                    {/* Main content - Articles */}
+                    <div className="lg:col-span-2">
+                        <div className="mb-6">
+                            <h2 className="text-2xl font-sans text-secondary-foreground">Articles and Blogs</h2>
+                        </div>
 
-                    <div className="flex mb-4 ml-[30vh]  flex-col lg:ml-[30vh] gap-6 mt-10 sm:ml-[10vh]">
-
-                        <h2 className="text-2xl font-sans text-secondary-foreground">Articles and Blogs</h2>
-
+                        <div className="flex flex-col gap-6">
+                            {filteredDetails.map((blog) => <BlogCard blog={blog} key={blog.id} onTitleClick={setIscategory} />)}
+                        </div>
                     </div>
 
+                    {/* Sidebar - Popular Content */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-20">
+                            <div className="mb-6">
+                                <h2 className="text-xl font-bold text-secondary-foreground"> Popular Content</h2>
+                            </div>
 
-
-                    <div className="flex flex-col ml-[30vh] sm:ml-[10vh] gap-6 lg:ml-[30vh] ">
-                        {filteredDetails.map((blog) => <BlogCard blog={blog} key={blog.id} onTitleClick={setIscategory} />)}
-
-                    </div>
-                </div>
-
-
-                <div className="mt-10">
-                    <div className="flex flex-col gap-6 mt-10 sm:ml-[10vh] sticky top-20 self-start">
-                        <div className="flex justify-center">
-                            <div className="flex-col flex gap-10">
-                                <h2 className="text-xl font-sans text-secondary-foreground"> Popular Content </h2>
-
-                                <div className="flex flex-col gap-2">
-
-                                    {ViewsFilteredData.map((blog) => (
-                                        <Link
-                                            key={blog.id}
-                                            href={`/blog/${blog.title}`}
-                                            className="group inline-block no-underline transition-colors hover:text-secondary-foreground"
+                            <div className="flex flex-col gap-3">
+                                {ViewsFilteredData.slice(0, 5).map((blog, index) => (
+                                    <Link
+                                        key={blog.id}
+                                        href={`/Blog/${blog.slug}`}
+                                        className="group block no-underline"
+                                    >
+                                        <motion.div
+                                            className="p-4 rounded-lg border border-border/40 bg-card/50 backdrop-blur-sm hover:bg-card hover:border-primary/50 transition-all duration-300"
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
                                         >
-                                            <motion.div
-                                                className="inline-block"
-                                                initial={{ x: 0 }}
-                                                animate={{ x: 0 }}
-                                                transition={{ duration: 0.3, ease: "easeOut" }}
-                                            >
-                                                <ArrowRight className="w-6 h-6 inline mb-2 mr-2 transition-all duration-300 group-hover:translate-x-2 " />
-                                            </motion.div>
-                                            <span className="inline text-xl font-semibold cursor-pointer ">
-                                                {blog.title.slice(0, 60) + "..."}
-                                            </span>
-                                        </Link>
-                                    ))}
-                                </div>
+                                            <div className="flex items-start gap-3">
+                                                <span className="text-2xl font-bold text-primary/90 min-w-8">
+                                                    {index + 1}.
+                                                </span>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-semibold text-sm text-secondary-foreground leading-tight font-sans group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                                                        {blog.title}
+                                                    </h3>
+                                                    <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-secondary font-medium inline-block">
+                                                        {blog.Tag}
+                                                    </span>
+                                                </div>
+                                                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 shrink-0 mt-1" />
+                                            </div>
+                                        </motion.div>
+                                    </Link>
+                                ))}
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
