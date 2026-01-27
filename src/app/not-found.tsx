@@ -15,6 +15,8 @@ export default function NotFound() {
 
                 <GobackButton Prop={{ value: "Home ", url: "/" }} />
 
+                
+
             </div>
         </>
     )
