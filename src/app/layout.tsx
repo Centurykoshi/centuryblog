@@ -39,7 +39,7 @@ export default function RootLayout({
 
 
           <ThemeProvider
-            attribute="class"
+            attribute="data-theme"
             defaultTheme="light"
             enableSystem
             disableTransitionOnChange
@@ -47,16 +47,16 @@ export default function RootLayout({
 
 
 
-        
-          {children}
 
-        </ThemeProvider>
+            {children}
 
-        {/* <Sidebar /> */}
-        <Toaster />
-      </body>
-    </html>
-  </TRPCReactProvider >
+          </ThemeProvider>
+
+          {/* <Sidebar /> */}
+          <Toaster />
+        </body>
+      </html>
+    </TRPCReactProvider >
 
   );
 }

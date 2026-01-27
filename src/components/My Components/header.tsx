@@ -97,7 +97,7 @@ export default function Header() {
 
 
 
-                            <div className="flex gap-4 mt-1 justify-end">
+                            <div className="flex gap-4 justify-end">
 
                                 <motion.button onClick={() => setSearchOpen(true)} className="flex items-center gap-2 px-4 py-2 rounded-full  border-border-primary bg-secondary/50 hover:bg-secondary transition-colors group" whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }}>
 
