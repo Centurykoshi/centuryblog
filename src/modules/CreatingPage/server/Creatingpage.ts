@@ -262,6 +262,41 @@ export const CreatingPage = createTRPCRouter({
         }),
 
 
+    search: baseProcedure
+        .input(z.object({
+            query: z.string().min(1),
+        }))
+        .query(async ({ input, ctx }) => {
+
+            const q = input.query;
+
+            const requiredata = await prisma.document.findMany({
+                where: {
+
+                    status: "PUBLISHED",
+                    title: {
+                        contains: q,
+                        mode: "insensitive"
+                    },
+                },
+
+                orderBy: {
+                    createdAt: "desc",
+                },
+
+                take: 10,
+
+
+
+
+
+            });
+
+            return requiredata
+
+        }),
+
+
 
 
 

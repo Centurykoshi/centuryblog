@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { TRPCReactProvider } from "@/trpc/client";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle";
 
 
 
@@ -37,25 +38,25 @@ export default function RootLayout({
         >
 
 
-          {/* <ThemeProvider
+          <ThemeProvider
             attribute="class"
             defaultTheme="light"
             enableSystem
             disableTransitionOnChange
-          > */}
+          >
 
 
 
-          {/* <ThemeToggle /> */}
+        
           {children}
 
-          {/* </ThemeProvider> */}
+        </ThemeProvider>
 
-          {/* <Sidebar /> */}
-          <Toaster />
-        </body>
-      </html>
-    </TRPCReactProvider>
+        {/* <Sidebar /> */}
+        <Toaster />
+      </body>
+    </html>
+  </TRPCReactProvider >
 
   );
 }
