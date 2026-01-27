@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Moon, Sun } from "lucide-react"
+import { Moon, MoonIcon, Sun, SunIcon, Flame, Bubbles, Coffee,  } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
@@ -12,29 +12,53 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+
+const themes = [
+    { name: "light", icon: Sun, label: "Light" },
+    { name: "dark", icon: Moon, label: "Dark" },
+    { name: "amber-light", icon: Flame, label: "Amber" },
+    { name: "bubblegum", icon: Bubbles, label: "Bubble" },
+    { name: "coffee", icon: Coffee, label: "coffee" },
+    { name: "ocean", icon: SunIcon, label: "ocean" },
+
+]
+
 export function ModeToggle() {
-    const { setTheme } = useTheme()
+    const { setTheme, theme } = useTheme();
+
+    const [isopen, setIsOpen] = React.useState(false);
+
+    const currentTheme = themes.find(t => t.name === theme) || themes[0];
+    const CurrentIcon = currentTheme.icon;
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                    <span className="sr-only">Toggle theme</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                    Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                    System
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative ">
+            <Button variant={"outline"} onClick={() => setIsOpen(!isopen)} size="icon" className="relative z-10">
+
+                <CurrentIcon className="w-6 h-6" />
+
+            </Button>
+
+            {isopen && (
+                <div className="absolute left-1/2 mt-2 -translate-x-1/2  overflow-hidden max-w-2xl max-h-15 duration-300 transition-all ease-in-out ">
+
+                    <div className="flex items-center gap-1 bg-background border border-b-secondary rounded-lg p-2 ">
+                        {themes.map((themeoption) => {
+                            const Icon = themeoption.icon
+                            return (
+                                <Button key={themeoption.name} className="hover:bg-secondary transition-all cursor-pointer duration-200" onClick={() => { setTheme(themeoption.name); setIsOpen(false); }}>
+
+                                    <Icon className="h-5 w-5" />
+
+
+                                </Button>
+                            )
+                        })}
+                    </div>
+
+                </div>
+            )}
+
+        </div>
     )
 }
