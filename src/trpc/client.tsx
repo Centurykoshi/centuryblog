@@ -23,16 +23,31 @@ function getQueryClient() {
 }
 
 function getUrl() {
+    const isClient = typeof window !== 'undefined';
+    const currentHostname = isClient ? window.location.hostname : 'N/A';
+    const currentOrigin = isClient ? window.location.origin : 'N/A';
+    
+    console.log('═══════════════════════════════════════');
+    console.log('🔍 getUrl() called');
+    console.log('📍 Environment:', isClient ? 'CLIENT' : 'SERVER');
+    console.log('🌐 Current hostname:', currentHostname);
+    console.log('🌐 Current origin:', currentOrigin);
+    console.log('⚙️  NEXT_PUBLIC_URL:', process.env.NEXT_PUBLIC_URL);
+    
     const base = (() => {
-        if (typeof window !== 'undefined') {
-            console.log('🌐 Client-side: Using relative URL');
+        if (isClient) {
+            console.log('✅ Using relative URL (empty string)');
             return ''; // Browser: use relative URL
         }
-        console.log('🖥️ Server-side: NEXT_PUBLIC_URL =', process.env.NEXT_PUBLIC_URL);
-        return process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'; // SSR: use env variable or localhost
+        console.log('🖥️ Server-side detected');
+        const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+        console.log('📤 Using SSR URL:', url);
+        return url;
     })();
+    
     const finalUrl = `${base}/api/trpc`;
-    console.log('🔗 Final tRPC URL:', finalUrl);
+    console.log('🎯 FINAL URL:', finalUrl);
+    console.log('═══════════════════════════════════════');
     return finalUrl;
 }
 export function TRPCReactProvider(
@@ -40,21 +55,34 @@ export function TRPCReactProvider(
         children: React.ReactNode;
     }>,
 ) {
+    console.log('🚀 TRPCReactProvider initializing...');
+    console.log('🌍 Window exists?', typeof window !== 'undefined');
+    console.log('🌍 Window origin:', typeof window !== 'undefined' ? window.location.origin : 'N/A');
+    
     // NOTE: Avoid useState when initializing the query client if you don't
     //       have a suspense boundary between this and the code that may
     //       suspend because React will throw away the client on the initial
     //       render if it suspends and there is no boundary
     const queryClient = getQueryClient();
-    const [trpcClient] = useState(() =>
-        createTRPCClient<AppRouter>({
+    const [trpcClient] = useState(() => {
+        console.log('⚡ Creating tRPC client...');
+        const client = createTRPCClient<AppRouter>({
             links: [
                 httpBatchLink({
                     // transformer: superjson, <-- if you use a data transformer
                     url: getUrl(),
+                    fetch: (url, options) => {
+                        console.log('📡 tRPC Fetch intercepted!');
+                        console.log('📍 Fetching URL:', url);
+                        console.log('📍 Full URL (resolved):', new URL(url as string, window.location.origin).href);
+                        return fetch(url, options);
+                    }
                 }),
             ],
-        }),
-    );
+        });
+        console.log('✅ tRPC client created');
+        return client;
+    });
     return (
         <QueryClientProvider client={queryClient}>
             <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
