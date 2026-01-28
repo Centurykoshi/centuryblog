@@ -22,15 +22,15 @@ model Document {
   userId      String
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String
-  excerpt     String? // Short description for SEO and previews
+  excerpt     String     @default("SOMETHING...") // Short description for SEO and previews
   contentJSON Json // TipTap editor content
   contentHTML String     @db.Text // Rendered HTML for display
-  featuredImg String?
+  featuredImg String
   status      PostStatus @default(DRAFT)
   published   DateTime?
   Tag         Tag        @default(All)
-  Author      String? @default("Piyush")
-  Views       Int @default(1)
+  Author      String?    @default("Piyush")
+  Views       Int        @default(1)
 
   @@index([status])
   @@index([published])

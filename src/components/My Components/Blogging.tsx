@@ -15,7 +15,7 @@ type Details = {
     slug: string;
     contentHTML: string;
     Tag: "All" | "Tech" | "LifeStyle" | "Games" | "Travel";
-    excerpt: string;
+    excerpt: string ;
 
 }
 

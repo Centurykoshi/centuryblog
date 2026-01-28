@@ -6,7 +6,7 @@ import CursorImageTrail from "./CursorImageTrail";
 import Link from "next/link";
 
 type ImageDetails = {
-    featuredImg: string;
+    featuredImg: string ;
     slug: string;
 }
 
