@@ -23,10 +23,16 @@ function getQueryClient() {
 }
 function getUrl() {
     const base = (() => {
-        if (typeof window !== 'undefined') return ''; // Browser: use relative URL
+        if (typeof window !== 'undefined') {
+            console.log('🌐 Client-side: Using relative URL');
+            return ''; // Browser: use relative URL
+        }
+        console.log('🖥️ Server-side: NEXT_PUBLIC_URL =', process.env.NEXT_PUBLIC_URL);
         return process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'; // SSR: use env variable or localhost
     })();
-    return `${base}/api/trpc`;
+    const finalUrl = `${base}/api/trpc`;
+    console.log('🔗 Final tRPC URL:', finalUrl);
+    return finalUrl;
 }
 export function TRPCReactProvider(
     props: Readonly<{
