@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import styles from "./BlogRender.module.css"
 import GobackButton from "../GoBackButton";
 import { useMutation } from "@tanstack/react-query";
+import { Prisma } from "@/generated/prisma";
 
 
 
@@ -14,10 +15,10 @@ type Blogs = {
     slug: string;
     title: string;
     contentHTML: string;
-    featuredImg: string | null;
+    featuredImg: string;
     Author: string | null;
     published: Date | null;
-    contentJSON: JSON;
+    contentJSON: Prisma.JsonValue;
     Views: number;
 
 
