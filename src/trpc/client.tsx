@@ -26,14 +26,14 @@ function getUrl() {
     const isClient = typeof window !== 'undefined';
     const currentHostname = isClient ? window.location.hostname : 'N/A';
     const currentOrigin = isClient ? window.location.origin : 'N/A';
-    
+
     console.log('═══════════════════════════════════════');
     console.log('🔍 getUrl() called');
     console.log('📍 Environment:', isClient ? 'CLIENT' : 'SERVER');
     console.log('🌐 Current hostname:', currentHostname);
     console.log('🌐 Current origin:', currentOrigin);
     console.log('⚙️  NEXT_PUBLIC_URL:', process.env.NEXT_PUBLIC_URL);
-    
+
     const base = (() => {
         if (isClient) {
             console.log('✅ Using relative URL (empty string)');
@@ -44,7 +44,7 @@ function getUrl() {
         console.log('📤 Using SSR URL:', url);
         return url;
     })();
-    
+
     const finalUrl = `${base}/api/trpc`;
     console.log('🎯 FINAL URL:', finalUrl);
     console.log('═══════════════════════════════════════');
@@ -58,7 +58,7 @@ export function TRPCReactProvider(
     console.log('🚀 TRPCReactProvider initializing...');
     console.log('🌍 Window exists?', typeof window !== 'undefined');
     console.log('🌍 Window origin:', typeof window !== 'undefined' ? window.location.origin : 'N/A');
-    
+
     // NOTE: Avoid useState when initializing the query client if you don't
     //       have a suspense boundary between this and the code that may
     //       suspend because React will throw away the client on the initial
