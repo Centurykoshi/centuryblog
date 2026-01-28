@@ -25,7 +25,7 @@ model Document {
   excerpt     String     @default("SOMETHING...") // Short description for SEO and previews
   contentJSON Json // TipTap editor content
   contentHTML String     @db.Text // Rendered HTML for display
-  featuredImg String
+  featuredImg String     @default("")
   status      PostStatus @default(DRAFT)
   published   DateTime?
   Tag         Tag        @default(All)

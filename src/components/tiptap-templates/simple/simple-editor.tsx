@@ -82,6 +82,7 @@ import "@/components/tiptap-templates/simple/simple-editor.scss"
 import content from "@/components/tiptap-templates/simple/data/content.json"
 import TagsSelection from "./TagsSeletion"
 import GobackButton from "@/components/My Components/GoBackButton"
+import { Prisma } from "@/generated/prisma"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -398,11 +399,10 @@ export function SimpleEditor() {
           console.log("Tag loaded: " + documentData.document.Tag);
         }
 
-        const querydata = documentData?.document.contentJSON;
-
-        // Load content
-        if (querydata) {
-          const contentString = String(documentData.document.contentJSON);
+        // Load content - cast from unknown to avoid type recursion
+        const contentJSON = documentData.document.contentJSON;
+        if (contentJSON) {
+          const contentString = String(contentJSON);
           const content = JSON.parse(contentString)
           editor.commands.setContent(content)
           setLastSavedContent(contentString)
@@ -463,7 +463,7 @@ export function SimpleEditor() {
         title: documentTitle,
         contentJSON,
         contentHTML,
-        featuredImg: featuredImage || undefined,
+        featuredImg: featuredImage ,
         Tag: filter,
       })
       setLastSavedContent(contentJSON)
