@@ -3,10 +3,11 @@
 import React from "react"
 import { NodeViewWrapper } from "@tiptap/react"
 import type { NodeViewProps } from "@tiptap/react"
-import { Button } from "@/components/tiptap-ui-primitive/button"
+
 import { CloseIcon } from "@/components/tiptap-icons/close-icon"
 import { handleImageDelete } from "@/lib/tiptap-utils"
 import "./image-with-delete.scss"
+import { Button } from "@/components/ui/button"
 
 export const ImageWithDelete: React.FC<NodeViewProps> = ({
     node,
@@ -40,7 +41,8 @@ export const ImageWithDelete: React.FC<NodeViewProps> = ({
 
                 <div className="image-controls">
                     <Button
-                        variant="destructive"
+                        variant={"destructive"}
+
                         size="sm"
                         onClick={handleDelete}
                         className="delete-button"

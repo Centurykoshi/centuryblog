@@ -109,7 +109,10 @@ export const CreatingPage = createTRPCRouter({
 
             return {
                 success: true,
-                document: document
+                document: {
+                    ...document,
+                    contentJSON: document.contentJSON as unknown
+                }
             };
         }),
 
