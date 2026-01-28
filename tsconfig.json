@@ -39,6 +39,8 @@
     ".next\\dev/types/**/*.ts"
 , "src/app/not-found"  ],
   "exclude": [
-    "node_modules"
+    "node_modules", 
+    ".next", 
+    "prisma/migrations"
   ]
 }
