@@ -22,6 +22,7 @@ export default async function EditingPageFront() {
         <>
             <Suspense fallback={<div> Loading..... </div>}>
                 <AllPosts initialPosts={Posts} />
+                
             </Suspense>
         </>
     );
