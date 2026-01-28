@@ -23,9 +23,8 @@ function getQueryClient() {
 }
 function getUrl() {
     const base = (() => {
-        if (typeof window !== 'undefined') return '';
-        if (process.env.VERCEL_URL) return `${process.env.NEXT_PUBLIC_URL}`;
-     
+        if (typeof window !== 'undefined') return ''; // Browser: use relative URL
+        return process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'; // SSR: use env variable or localhost
     })();
     return `${base}/api/trpc`;
 }
