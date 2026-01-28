@@ -213,7 +213,9 @@ export const CreatingPage = createTRPCRouter({
                     slug: finalSlug,
                     Tag: input.Tag || existingDocument.Tag,
                     Author: input.Author,
-                    published: input.status === "PUBLISHED" ? new Date() : null,
+                    published: input.status
+                        ? (input.status === "PUBLISHED" ? new Date() : null)
+                        : existingDocument.published,
                 }
             });
 
