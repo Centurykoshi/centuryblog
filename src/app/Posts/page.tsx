@@ -2,6 +2,9 @@ import AllPosts from "@/components/My Components/Dashboard/AllPosts";
 import prisma from "@/lib/prisma";
 import { Suspense } from "react";
 
+// Force dynamic rendering - no caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function EditingPageFront() {
 

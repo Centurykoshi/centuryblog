@@ -67,8 +67,15 @@ export function TRPCReactProvider(
                         console.log('📍 Headers:', options?.headers);
                         console.log('📍 Body preview:', options?.body ? String(options.body).substring(0, 200) : 'none');
                         console.log('═══════════════════════════════════');
-                        return fetch(url, options).then(res => {
+                        return fetch(url, options).then(async res => {
                             console.log('📥 Response status:', res.status, res.statusText);
+                            const clonedRes = res.clone();
+                            try {
+                                const data = await clonedRes.json();
+                                console.log('📦 Response data:', JSON.stringify(data, null, 2));
+                            } catch (e) {
+                                console.log('⚠️ Could not parse response as JSON');
+                            }
                             return res;
                         }).catch(err => {
                             console.error('❌ Fetch error:', err);
