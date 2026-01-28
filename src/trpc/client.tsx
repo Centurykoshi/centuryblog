@@ -21,6 +21,7 @@ function getQueryClient() {
     if (!browserQueryClient) browserQueryClient = makeQueryClient();
     return browserQueryClient;
 }
+
 function getUrl() {
     const base = (() => {
         if (typeof window !== 'undefined') {
