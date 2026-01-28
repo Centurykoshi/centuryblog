@@ -21,28 +21,30 @@ function getQueryClient() {
     if (!browserQueryClient) browserQueryClient = makeQueryClient();
     return browserQueryClient;
 }
-
 function getUrl() {
-    if (typeof window !== 'undefined') {
-        return ''; // Browser: use relative URL
-    }
-    return process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'; // SSR
+    const base = (() => {
+        if (typeof window !== 'undefined') return ''; // Browser: use relative URL
+        if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // Vercel SSR
+        return 'http://localhost:3000'; // Local development SSR
+    })();
+    return `${base}/api/trpc`;
 }
 export function TRPCReactProvider(
     props: Readonly<{
         children: React.ReactNode;
     }>,
 ) {
+    // NOTE: Avoid useState when initializing the query client if you don't
+    //       have a suspense boundary between this and the code that may
+    //       suspend because React will throw away the client on the initial
+    //       render if it suspends and there is no boundary
     const queryClient = getQueryClient();
     const [trpcClient] = useState(() =>
         createTRPCClient<AppRouter>({
             links: [
                 httpBatchLink({
+                    // transformer: superjson, <-- if you use a data transformer
                     url: getUrl(),
-                    headers: () => ({
-                        'content-type': 'application/json',
-                    }),
-                    methodOverride: 'POST',
                 }),
             ],
         }),
