@@ -2,7 +2,7 @@
 
 import { useTRPC } from "@/trpc/client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styles from "./BlogRender.module.css"
 import GobackButton from "../GoBackButton";
 import { useMutation } from "@tanstack/react-query";
@@ -27,8 +27,7 @@ type Blogs = {
 
 export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
 
-
-    const [blogdetail, setblogdetail] = useState(intialBlogs);
+    const blogdetail = intialBlogs;
 
     const content = typeof blogdetail.contentJSON === "string" ? JSON.parse(blogdetail.contentJSON) : blogdetail.contentJSON;
 
