@@ -7,6 +7,8 @@ import { unstable_noStore } from "next/cache";
 
 export default async function page({ params }: { params: { slug: string } }) {
 
+
+
     unstable_noStore();
 
     const { slug } = await params;
@@ -16,6 +18,7 @@ export default async function page({ params }: { params: { slug: string } }) {
 
         where: {
             slug: slug,
+            status: "PUBLISHED",
         },
         select: {
             id: true,

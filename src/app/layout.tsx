@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Get Okay || Build Better",
-  description: "Created by the Piyush",
+  title: "Cenno || Blog",
+  description: "Created Build Better ",
 };
 
 export default function RootLayout({

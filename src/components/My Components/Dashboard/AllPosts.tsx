@@ -27,6 +27,7 @@ type Posts = {
 export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
 
     const searchParams = useSearchParams();
+    const trpc = useTRPC();
 
     const [posts, setPosts] = useState(initialPosts);
     const [pendingChanges, setPendingChanges] = useState<Record<string, "DRAFT" | "PUBLISHED" | "UNPUBLISH">>({});
@@ -49,7 +50,7 @@ export default function AllPosts({ initialPosts }: { initialPosts: Posts[] }) {
         if (filter === "All") return true;
         return post.status === filter;
     })
-    const trpc = useTRPC();
+
 
     const UpdateDocumentSatus = useMutation(trpc.creating_page.updateDocument.mutationOptions({
     }));

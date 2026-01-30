@@ -7,6 +7,7 @@ import styles from "./BlogRender.module.css"
 import GobackButton from "../GoBackButton";
 import { useMutation } from "@tanstack/react-query";
 import { Prisma } from "@/generated/prisma";
+import { Metadata } from "next";
 
 
 
@@ -25,7 +26,11 @@ type Blogs = {
 
 }
 
+
 export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
+
+    
+
 
     const blogdetail = intialBlogs;
 

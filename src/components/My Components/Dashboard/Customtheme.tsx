@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Moon, MoonIcon, Sun, SunIcon, Flame, Bubbles, Coffee,  } from "lucide-react"
+import { Moon, Sun, Flame, Bubbles, Coffee,  } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,6 @@ const themes = [
     { name: "amber-light", icon: Flame, label: "Amber" },
     { name: "bubblegum", icon: Bubbles, label: "Bubble" },
     { name: "coffee", icon: Coffee, label: "coffee" },
-    { name: "ocean", icon: SunIcon, label: "ocean" },
 
 ]
 
