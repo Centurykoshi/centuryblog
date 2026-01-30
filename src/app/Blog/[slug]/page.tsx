@@ -3,6 +3,9 @@ import BlogViewer from "@/components/My Components/BlogViewer/BlogViewer";
 import Header from "@/components/My Components/header";
 import prisma from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function page({ params }: { params: { slug: string } }) {
 
     const { slug } = await params;
