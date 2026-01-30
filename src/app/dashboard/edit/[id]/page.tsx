@@ -1,3 +1,5 @@
+"use client";
+
 import MainEditPage from "@/components/CreatePage/main";
 import Navbar from "@/components/CreatePage/Navbar";
 import Dashboard from "@/components/My Components/Dashboard/Dashboar";
@@ -7,7 +9,7 @@ export default function EditPage() {
     return (
         <>
 
-        
+
             <SimpleEditor />
         </>
     )

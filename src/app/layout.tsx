@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
 
     <TRPCReactProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
@@ -46,13 +46,11 @@ export default function RootLayout({
           >
 
 
-
-
             {children}
 
           </ThemeProvider>
 
-          {/* <Sidebar /> */}
+
           <Toaster />
         </body>
       </html>

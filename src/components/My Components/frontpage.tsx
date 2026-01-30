@@ -10,7 +10,7 @@ import Blogging from "./Blogging";
 import Model from "./model";
 import Footer from "./footer";
 import prisma from "@/lib/prisma";
-import { unstable_SuspenseList } from "react";
+
 import { unstable_noStore } from "next/cache";
 
 
@@ -18,7 +18,7 @@ import { unstable_noStore } from "next/cache";
 
 export default async function Frontpage() {
 
-    unstable_noStore();
+   
 
     const BlogDetails = await prisma.document.findMany({
 

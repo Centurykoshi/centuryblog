@@ -208,7 +208,7 @@ export const CreatingPage = createTRPCRouter({
                     contentHTML: input.contentHTML || existingDocument.contentHTML,
                     excerpt: pxcerpt,
                     featuredImg: input.featuredImg || existingDocument.featuredImg,
-                    status: input.status || existingDocument.status,
+                status: input.status || existingDocument.status,
                     updatedAt: new Date(),
                     slug: finalSlug,
                     Tag: input.Tag || existingDocument.Tag,

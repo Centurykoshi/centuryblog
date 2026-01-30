@@ -232,9 +232,19 @@ export function SimpleEditor() {
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main"
   )
+  const [isMounted, setIsMounted] = useState(false)
   const toolbarRef = useRef<HTMLDivElement>(null)
   const params = useParams()
   const id = params?.id as string
+
+  // Defer mounting to avoid flushSync issues
+  useEffect(() => {
+    // Use setTimeout to defer to next tick
+    const timer = setTimeout(() => {
+      setIsMounted(true)
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Save states
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
@@ -258,6 +268,7 @@ export function SimpleEditor() {
   // Initialize editor first
   const editor = useEditor({
     immediatelyRender: false,
+    shouldRerenderOnTransaction: false,
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -463,7 +474,7 @@ export function SimpleEditor() {
         title: documentTitle,
         contentJSON,
         contentHTML,
-        featuredImg: featuredImage ,
+        featuredImg: featuredImage,
         Tag: filter,
       })
       setLastSavedContent(contentJSON)
@@ -549,6 +560,15 @@ export function SimpleEditor() {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [saveDocument])
+
+  // Early return after all hooks - avoid flushSync issues
+  if (!isMounted || !editor) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-secondary-foreground">Loading editor...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen overflow-x-auto overflow-y-hidden flex flex-col items-center">
