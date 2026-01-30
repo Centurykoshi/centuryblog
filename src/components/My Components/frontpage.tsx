@@ -18,7 +18,7 @@ import { unstable_noStore } from "next/cache";
 
 export default async function Frontpage() {
 
-   
+    unstable_noStore();
 
     const BlogDetails = await prisma.document.findMany({
 
