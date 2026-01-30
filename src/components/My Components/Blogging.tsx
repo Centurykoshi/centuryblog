@@ -38,7 +38,7 @@ export default function Blogging({ initialDetails, ViewsData }: { initialDetails
 
     const [iscategory, setIscategory] = useState("All");
 
-    const [details, setdetails] = useState(initialDetails);
+    const details = initialDetails;
 
 
     const filteredDetails = details.filter(detail => {
