@@ -10,6 +10,8 @@ import { Eye, EyeIcon, EyeOff, Loader2, Lock, LockIcon, Mail } from "lucide-reac
 import { Input } from "../ui/input";
 import { setPassword } from "better-auth/api";
 import { motion } from "framer-motion";
+import Header from "./header";
+import GobackButton from "./GoBackButton";
 
 
 export default function SigninPage() {
@@ -60,8 +62,10 @@ export default function SigninPage() {
     return (
         <>
 
-            <div className="min-h-screen flex justify-center items-center relative overflow-hidden">
+            <div className="min-h-screen flex justify-center items-center relative overflow-hidden flex-col gap-4">
 
+
+                <GobackButton Prop={{value : "Home Page", url:"/"} }/>
                 {/* Animated background elements */}
                 <motion.div
                     className="absolute top-20 left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"
@@ -171,8 +175,6 @@ export default function SigninPage() {
                                             className="pl-10 pr-10 h-10 text-sm transition-all duration-300 focus:scale-[1.02]" />
 
                                         <motion.div
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.95 }}
                                         >
                                             <Button type="button" variant={"ghost"} className="absolute right-1 top-1/2 transform -translate-y-1/2 hover:bg-none bg-transparent h-7 w-7 p-0" onClick={() => SetShowPassword(!ShowPassword)}>
 
