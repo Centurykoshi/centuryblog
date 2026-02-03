@@ -52,15 +52,23 @@ export interface ColorHighlightPopoverContentProps {
 
 export interface ColorHighlightPopoverProps
   extends Omit<ButtonProps, "type">,
-    Pick<
-      UseColorHighlightConfig,
-      "editor" | "hideWhenUnavailable" | "onApplied"
-    > {
+  Pick<
+    UseColorHighlightConfig,
+    "editor" | "hideWhenUnavailable" | "onApplied"
+  > {
   /**
    * Optional colors to use in the highlight popover.
    * If not provided, defaults to a predefined set of colors.
    */
   colors?: HighlightColor[]
+  /**
+   * Controlled open state
+   */
+  open?: boolean
+  /**
+   * Callback for when the popover opens or closes
+   */
+  onOpenChange?: (isOpen: boolean) => void
 }
 
 export const ColorHighlightPopoverButton = forwardRef<
@@ -173,10 +181,14 @@ export function ColorHighlightPopover({
   ]),
   hideWhenUnavailable = false,
   onApplied,
+  open: controlledOpen,
+  onOpenChange,
   ...props
 }: ColorHighlightPopoverProps) {
   const { editor } = useTiptapEditor(providedEditor)
-  const [isOpen, setIsOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const isOpen = isControlled ? controlledOpen : internalOpen
   const { isVisible, canColorHighlight, isActive, label, Icon } =
     useColorHighlight({
       editor,
@@ -184,10 +196,17 @@ export function ColorHighlightPopover({
       onApplied,
     })
 
+  const handleOpenChange = (open: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(open)
+    }
+    onOpenChange?.(open)
+  }
+
   if (!isVisible) return null
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <ColorHighlightPopoverButton
           disabled={!canColorHighlight}

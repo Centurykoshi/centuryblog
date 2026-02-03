@@ -62,7 +62,7 @@ export interface LinkMainProps {
 
 export interface LinkPopoverProps
   extends Omit<ButtonProps, "type">,
-    UseLinkPopoverConfig {
+  UseLinkPopoverConfig {
   /**
    * Callback for when the popover opens or closes.
    */
@@ -72,6 +72,10 @@ export interface LinkPopoverProps
    * @default true
    */
   autoOpenOnLinkActive?: boolean
+  /**
+   * Controlled open state
+   */
+  open?: boolean
 }
 
 /**
@@ -213,13 +217,16 @@ export const LinkPopover = forwardRef<HTMLButtonElement, LinkPopoverProps>(
       onOpenChange,
       autoOpenOnLinkActive = true,
       onClick,
+      open: controlledOpen,
       children,
       ...buttonProps
     },
     ref
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
-    const [isOpen, setIsOpen] = useState(false)
+    const [internalOpen, setInternalOpen] = useState(false)
+    const isControlled = controlledOpen !== undefined
+    const isOpen = isControlled ? controlledOpen : internalOpen
 
     const {
       isVisible,
@@ -240,31 +247,33 @@ export const LinkPopover = forwardRef<HTMLButtonElement, LinkPopoverProps>(
 
     const handleOnOpenChange = useCallback(
       (nextIsOpen: boolean) => {
-        setIsOpen(nextIsOpen)
+        if (!isControlled) {
+          setInternalOpen(nextIsOpen)
+        }
         onOpenChange?.(nextIsOpen)
       },
-      [onOpenChange]
+      [onOpenChange, isControlled]
     )
 
     const handleSetLink = useCallback(() => {
       setLink()
-      setIsOpen(false)
-    }, [setLink])
+      handleOnOpenChange(false)
+    }, [setLink, handleOnOpenChange])
 
     const handleClick = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event)
         if (event.defaultPrevented) return
-        setIsOpen(!isOpen)
+        handleOnOpenChange(!isOpen)
       },
-      [onClick, isOpen]
+      [onClick, isOpen, handleOnOpenChange]
     )
 
     useEffect(() => {
-      if (autoOpenOnLinkActive && isActive) {
-        setIsOpen(true)
+      if (autoOpenOnLinkActive && isActive && !isControlled) {
+        setInternalOpen(true)
       }
-    }, [autoOpenOnLinkActive, isActive])
+    }, [autoOpenOnLinkActive, isActive, isControlled])
 
     if (!isVisible) {
       return null

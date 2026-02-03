@@ -13,7 +13,6 @@ import { ImageWithDeleteExtension } from "@/components/tiptap-node/image-with-de
 import { TaskItem, TaskList } from "@tiptap/extension-list"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Typography } from "@tiptap/extension-typography"
-import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Placeholder } from "@tiptap/extension-placeholder"
@@ -46,11 +45,6 @@ import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button"
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button"
 import {
-  ColorHighlightPopover,
-  ColorHighlightPopoverContent,
-  ColorHighlightPopoverButton,
-} from "@/components/tiptap-ui/color-highlight-popover"
-import {
   LinkPopover,
   LinkContent,
   LinkButton,
@@ -61,7 +55,6 @@ import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
 
 // --- Icons ---
 import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon"
-import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
 import { LinkIcon } from "@/components/tiptap-icons/link-icon"
 import { Save, Clock } from "lucide-react"
 
@@ -85,17 +78,19 @@ import GobackButton from "@/components/My Components/GoBackButton"
 import { Prisma } from "@/generated/prisma"
 
 const MainToolbarContent = ({
-  onHighlighterClick,
   onLinkClick,
   isMobile,
   onSave,
   saveStatus,
+  openDropdown,
+  onDropdownChange,
 }: {
-  onHighlighterClick: () => void
   onLinkClick: () => void
   isMobile: boolean
   onSave: () => void
   saveStatus: 'idle' | 'saving' | 'saved' | 'error'
+  openDropdown: string | null
+  onDropdownChange: (dropdown: string | null) => void
 }) => {
   return (
     <>
@@ -109,10 +104,17 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <HeadingDropdownMenu levels={[2, 3, 4]} portal={isMobile} />
+        <HeadingDropdownMenu
+          levels={[2, 3, 4]}
+          portal={isMobile}
+          open={openDropdown === 'heading'}
+          onOpenChange={(isOpen) => onDropdownChange(isOpen ? 'heading' : null)}
+        />
         <ListDropdownMenu
           types={["bulletList", "orderedList", "taskList"]}
           portal={isMobile}
+          open={openDropdown === 'list'}
+          onOpenChange={(isOpen) => onDropdownChange(isOpen ? 'list' : null)}
         />
         <BlockquoteButton />
         <CodeBlockButton />
@@ -127,11 +129,13 @@ const MainToolbarContent = ({
         <MarkButton type="code" />
         <MarkButton type="underline" />
         {!isMobile ? (
-          <ColorHighlightPopover />
+          <LinkPopover
+            open={openDropdown === 'link'}
+            onOpenChange={(isOpen) => onDropdownChange(isOpen ? 'link' : null)}
+          />
         ) : (
-          <ColorHighlightPopoverButton onClick={onHighlighterClick} />
+          <LinkButton onClick={onLinkClick} />
         )}
-        {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
       </ToolbarGroup>
 
       <ToolbarSeparator />
@@ -198,41 +202,32 @@ const MainToolbarContent = ({
 }
 
 const MobileToolbarContent = ({
-  type,
   onBack,
 }: {
-  type: "highlighter" | "link"
   onBack: () => void
 }) => (
   <>
     <ToolbarGroup>
       <Button data-style="ghost" onClick={onBack}>
         <ArrowLeftIcon className="tiptap-button-icon" />
-        {type === "highlighter" ? (
-          <HighlighterIcon className="tiptap-button-icon" />
-        ) : (
-          <LinkIcon className="tiptap-button-icon" />
-        )}
+        <LinkIcon className="tiptap-button-icon" />
       </Button>
     </ToolbarGroup>
 
     <ToolbarSeparator />
 
-    {type === "highlighter" ? (
-      <ColorHighlightPopoverContent />
-    ) : (
-      <LinkContent />
-    )}
+    <LinkContent />
   </>
 )
 
 export function SimpleEditor() {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
-  const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
+  const [mobileView, setMobileView] = useState<"main" | "link">(
     "main"
   )
   const [isMounted, setIsMounted] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const toolbarRef = useRef<HTMLDivElement>(null)
   const params = useParams()
   const id = params?.id as string
@@ -293,7 +288,6 @@ export function SimpleEditor() {
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TaskList,
       TaskItem.configure({ nested: true }),
-      Highlight.configure({ multicolor: true }),
       ImageWithDeleteExtension,
       Typography,
       Superscript,
@@ -505,6 +499,22 @@ export function SimpleEditor() {
     }
   }, [editor, scheduleAutoSave])
 
+  // Close dropdowns when clicking in the editor
+  useEffect(() => {
+    if (!editor) return
+
+    const handleSelectionUpdate = () => {
+      if (openDropdown) {
+        setOpenDropdown(null)
+      }
+    }
+
+    editor.on('selectionUpdate', handleSelectionUpdate)
+    return () => {
+      editor.off('selectionUpdate', handleSelectionUpdate)
+    }
+  }, [editor, openDropdown])
+
   // Auto-save when title changes
   useEffect(() => {
     scheduleAutoSave()
@@ -571,9 +581,9 @@ export function SimpleEditor() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-auto overflow-y-hidden flex flex-col items-center">
+    <div className="min-h-screen flex flex-col">
 
-      <div className="absolute top-5 right-[3%]">
+      <div className="absolute top-5 right-[3%] z-50">
         <GobackButton Prop={{ value: "Go To Posts", url: "/Posts" }} />
       </div>
       <EditorContext.Provider value={{ editor }}>
@@ -581,7 +591,7 @@ export function SimpleEditor() {
 
 
         {/* Featured Image Section */}
-        <div className="max-w-226 w-full opacity-80 bg-secondary/20">
+        <div className="max-w-226 w-full opacity-80 bg-secondary/20 mx-auto">
           {featuredImage ? (
             <div className="featured-image-container ">
               <div className="featured-image-wrapper">
@@ -731,19 +741,19 @@ export function SimpleEditor() {
           )}
         </div>
 
-        <div className=" max-w-226 w-full whitespace-normal wrap-break-word m-2  p-2  border-b-secondary border-b-2">
+        <div className="max-w-226 w-full whitespace-normal wrap-break-word m-2 p-2 border-b-secondary border-b-2 mx-auto">
           <textarea
             ref={titleTextareaRef}
             value={title}
             onChange={handleTitleChange}
             placeholder="Enter your article title..."
-            className="w-full border-none outline-none text-4xl font-bold text-secondary-foreground resize-none overflow-hidden"
+            className="w-full border-none outline-none text-4xl font-bold text-secondary-foreground resize-none overflow-hidden bg-transparent"
             maxLength={200}
             rows={1}
           />
         </div>
 
-        {/* Toolbar */}
+        {/* Toolbar - Sticky */}
         <Toolbar
           ref={toolbarRef}
           style={{
@@ -756,32 +766,35 @@ export function SimpleEditor() {
         >
           {mobileView === "main" ? (
             <MainToolbarContent
-              onHighlighterClick={() => setMobileView("highlighter")}
               onLinkClick={() => setMobileView("link")}
               isMobile={isMobile}
               onSave={saveDocument}
+              openDropdown={openDropdown}
+              onDropdownChange={setOpenDropdown}
               saveStatus={saveStatus}
             />
           ) : (
             <MobileToolbarContent
-              type={mobileView === "highlighter" ? "highlighter" : "link"}
               onBack={() => setMobileView("main")}
             />
           )}
         </Toolbar>
 
-        {/* Content Editor */}
-        <div className=" max-w-200 flex items-center felx-col w-full min-h-40">
-          <EditorContent
-            editor={editor}
-            role="presentation"
-            className=" pb-20 simple-editor-content text-secondary-foreground"
-            placeholder="Start writing your article content here..."
-          />
+        {/* Scrollable Content Area */}
+        <div className=" overflow-y-auto flex flex-col items-center">
+          {/* Content Editor */}
+          <div className="max-w-200 flex  w-full min-h-40">
+            <EditorContent
+              editor={editor}
+              role="presentation"
+              className="mb-20 simple-editor-content text-secondary-foreground"
+              placeholder="Start writing your article content here..."
+            />
+          </div>
+
+          <TagsSelection value={filter} onChange={setFilter} />
         </div>
       </EditorContext.Provider>
-
-      <TagsSelection value={filter} onChange={setFilter} />
     </div>
   )
 }
