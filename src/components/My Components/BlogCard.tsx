@@ -44,7 +44,7 @@ export default function BlogCard({ blog, onTitleClick }: { blog: Blog, onTitleCl
                 >
                     <Button
                         variant={"ghost"}
-                        className="text-xs font-semibold text-muted-foreground border-none relative z-10 px-3 py-1"
+                        className="text-xs font-semibold text-foreground border-none relative z-10 px-3 py-1"
                         onClick={() => onTitleClick(blog.Tag)}
 
                     >
@@ -56,7 +56,7 @@ export default function BlogCard({ blog, onTitleClick }: { blog: Blog, onTitleCl
 
             </div>
 
-            <Link href={`/Blog/${blog.slug}`} onClick={() => { }} className="cursor-pointer no-underline w-fit inline hover:animate-pulse text-sm font-semibold mt-2 "
+            <Link href={`/Blog/${blog.slug}`} onClick={() => { }} className="cursor-pointer no-underline w-fit inline hover:animate-pulse text-sm text-primary font-semibold mt-2 "
                 onMouseEnter={() => setIsHoveredRead(true)}
                 onMouseLeave={() => setIsHoveredRead(false)}
             >

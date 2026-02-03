@@ -1,13 +1,13 @@
 :root {
-  --tiptap-card-bg-color: var(--white);
-  --tiptap-card-border-color: var(--tt-gray-light-a-100);
-  --tiptap-card-group-label-color: var(--tt-gray-light-a-800);
+  --tiptap-card-bg-color: hsl(var(--card));
+  --tiptap-card-border-color: hsl(var(--border));
+  --tiptap-card-group-label-color: hsl(var(--muted-foreground));
 }
 
 .dark {
-  --tiptap-card-bg-color: var(--tt-gray-dark-50);
-  --tiptap-card-border-color: var(--tt-gray-dark-a-100);
-  --tiptap-card-group-label-color: var(--tt-gray-dark-a-800);
+  --tiptap-card-bg-color: hsl(var(--card));
+  --tiptap-card-border-color: hsl(var(--border));
+  --tiptap-card-group-label-color: hsl(var(--muted-foreground));
 }
 
 .tiptap-card {
@@ -15,18 +15,20 @@
   --border-width: 1px;
 
   border-radius: calc(var(--padding) + var(--tt-radius-lg));
-  box-shadow: var(--tt-shadow-elevated-md);
+  box-shadow: var(--tt-shadow-elevated-md), 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: var(--tiptap-card-bg-color);
   border: 1px solid var(--tiptap-card-border-color);
   display: flex;
   flex-direction: column;
   outline: none;
   align-items: center;
+  z-index: 20;
 
   position: relative;
   min-width: 0;
   word-wrap: break-word;
   background-clip: border-box;
+  opacity: 1;
 }
 
 .tiptap-card-header {

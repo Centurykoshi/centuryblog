@@ -26,7 +26,7 @@ import { Card, CardBody } from "@/components/tiptap-ui-primitive/card"
 
 export interface HeadingDropdownMenuProps
   extends Omit<ButtonProps, "type">,
-    UseHeadingDropdownMenuConfig {
+  UseHeadingDropdownMenuConfig {
   /**
    * Whether to render the dropdown menu in a portal
    * @default false
@@ -36,6 +36,10 @@ export interface HeadingDropdownMenuProps
    * Callback for when the dropdown opens or closes
    */
   onOpenChange?: (isOpen: boolean) => void
+  /**
+   * Controlled open state
+   */
+  open?: boolean
 }
 
 /**
@@ -54,12 +58,15 @@ export const HeadingDropdownMenu = forwardRef<
       hideWhenUnavailable = false,
       portal = false,
       onOpenChange,
+      open: controlledOpen,
       ...buttonProps
     },
     ref
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
-    const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [internalOpen, setInternalOpen] = useState<boolean>(false)
+    const isControlled = controlledOpen !== undefined
+    const isOpen = isControlled ? controlledOpen : internalOpen
     const { isVisible, isActive, canToggle, Icon } = useHeadingDropdownMenu({
       editor,
       levels,
@@ -69,10 +76,12 @@ export const HeadingDropdownMenu = forwardRef<
     const handleOpenChange = useCallback(
       (open: boolean) => {
         if (!editor || !canToggle) return
-        setIsOpen(open)
+        if (!isControlled) {
+          setInternalOpen(open)
+        }
         onOpenChange?.(open)
       },
-      [canToggle, editor, onOpenChange]
+      [canToggle, editor, onOpenChange, isControlled]
     )
 
     if (!isVisible) {
@@ -80,7 +89,7 @@ export const HeadingDropdownMenu = forwardRef<
     }
 
     return (
-      <DropdownMenu modal open={isOpen} onOpenChange={handleOpenChange}>
+      <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
         <DropdownMenuTrigger asChild>
           <Button
             type="button"

@@ -91,7 +91,7 @@ export const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>(
         role="toolbar"
         aria-label="toolbar"
         data-variant={variant}
-        className={cn("tiptap-toolbar", className)}
+        className={cn("tiptap-toolbar ", className)}
         {...props}
       >
         {children}

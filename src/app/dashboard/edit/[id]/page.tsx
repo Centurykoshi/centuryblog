@@ -1,8 +1,8 @@
 "use client";
 
-import MainEditPage from "@/components/CreatePage/main";
-import Navbar from "@/components/CreatePage/Navbar";
-import Dashboard from "@/components/My Components/Dashboard/Dashboar";
+
+
+import SidebarDashboard from "@/components/My Components/Dashboard/Sidebar";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 export default function EditPage() {
@@ -10,6 +10,9 @@ export default function EditPage() {
         <>
 
 
+
+
+            <SidebarDashboard />
             <SimpleEditor />
         </>
     )

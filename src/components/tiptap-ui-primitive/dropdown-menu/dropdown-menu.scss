@@ -1,12 +1,12 @@
 .tiptap-dropdown-menu {
-  --tt-dropdown-menu-bg-color: var(--white);
-  --tt-dropdown-menu-border-color: var(--tt-gray-light-a-100);
-  --tt-dropdown-menu-text-color: var(--tt-gray-light-a-600);
+  --tt-dropdown-menu-bg-color: hsl(var(--popover));
+  --tt-dropdown-menu-border-color: hsl(var(--border));
+  --tt-dropdown-menu-text-color: hsl(var(--popover-foreground));
 
   .dark & {
-    --tt-dropdown-menu-border-color: var(--tt-gray-dark-a-50);
-    --tt-dropdown-menu-bg-color: var(--tt-gray-dark-50);
-    --tt-dropdown-menu-text-color: var(--tt-gray-dark-a-600);
+    --tt-dropdown-menu-border-color: hsl(var(--border));
+    --tt-dropdown-menu-bg-color: hsl(var(--popover));
+    --tt-dropdown-menu-text-color: hsl(var(--popover-foreground));
   }
 }
 
@@ -14,12 +14,16 @@
     --------- DROPDOWN MENU STYLING SETTINGS -----------
     -------------------------------------------- */
 .tiptap-dropdown-menu {
-  z-index: 50;
+  z-index: 150;
   outline: none;
   transform-origin: var(--radix-dropdown-menu-content-transform-origin);
   max-height: var(--radix-dropdown-menu-content-available-height);
+  background: var(--tt-dropdown-menu-bg-color);
+  border: 1px solid var(--tt-dropdown-menu-border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  > * {
+  >* {
     max-height: var(--radix-dropdown-menu-content-available-height);
   }
 

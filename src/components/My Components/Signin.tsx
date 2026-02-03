@@ -137,8 +137,6 @@ export default function SigninPage() {
                                 >
                                     <div className="relative mb-4">
                                         <motion.div
-                                            whileHover={{ scale: 1.1, rotate: 5 }}
-                                            transition={{ type: "spring", stiffness: 400 }}
                                         >
                                             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-secondary font-bold" />
                                         </motion.div>
@@ -163,8 +161,7 @@ export default function SigninPage() {
 
                                     <div className="relative">
                                         <motion.div
-                                            whileHover={{ scale: 1.1, rotate: 5 }}
-                                            transition={{ type: "spring", stiffness: 400 }}
+                                           
                                         >
                                             <LockIcon className="absolute  left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-secondary font-bold" />
                                         </motion.div>
@@ -202,7 +199,6 @@ export default function SigninPage() {
 
                                         {isLoading ? (
                                             <motion.div
-                                                animate={{ rotate: 360 }}
                                                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                             >
                                                 <Loader2 className="mr-2 h-4 w-4" />

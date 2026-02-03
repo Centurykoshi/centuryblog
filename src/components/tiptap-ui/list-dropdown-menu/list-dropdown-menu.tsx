@@ -48,6 +48,10 @@ export interface ListDropdownMenuProps extends Omit<ButtonProps, "type"> {
    * @default false
    */
   portal?: boolean
+  /**
+   * Controlled open state
+   */
+  open?: boolean
 }
 
 export function ListDropdownMenu({
@@ -56,10 +60,13 @@ export function ListDropdownMenu({
   hideWhenUnavailable = false,
   onOpenChange,
   portal = false,
+  open: controlledOpen,
   ...props
 }: ListDropdownMenuProps) {
   const { editor } = useTiptapEditor(providedEditor)
-  const [isOpen, setIsOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const isOpen = isControlled ? controlledOpen : internalOpen
 
   const { filteredLists, canToggle, isActive, isVisible, Icon } =
     useListDropdownMenu({
@@ -70,10 +77,12 @@ export function ListDropdownMenu({
 
   const handleOnOpenChange = useCallback(
     (open: boolean) => {
-      setIsOpen(open)
+      if (!isControlled) {
+        setInternalOpen(open)
+      }
       onOpenChange?.(open)
     },
-    [onOpenChange]
+    [onOpenChange, isControlled]
   )
 
   if (!isVisible) {
