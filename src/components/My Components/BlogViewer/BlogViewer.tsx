@@ -29,7 +29,7 @@ type Blogs = {
 
 export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
 
-    
+
 
 
     const blogdetail = intialBlogs;
@@ -96,13 +96,40 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
     }) : "Not Published get better and put the data "
 
 
+    function renderText(textNode: any, index: number) {
+        let text = textNode.text || "";
+        const marks = textNode.marks || [];
 
+        // Apply marks (bold, italic, etc.)
+        return marks.reduce((content: any, mark: any) => {
+            switch (mark.type) {
+                case "bold":
+                    return <strong key={index}>{content}</strong>;
+                case "italic":
+                    return <em key={index}>{content}</em>;
+                case "strike":
+                    return <s key={index}>{content}</s>;
+                case "underline":
+                    return <u key={index}>{content}</u>;
+                case "code":
+                    return <code key={index} className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">{content}</code>;
+                case "superscript":
+                    return <sup key={index}>{content}</sup>;
+                case "subscript":
+                    return <sub key={index}>{content}</sub>;
+                case "link":
+                    return <a key={index} href={mark.attrs?.href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">{content}</a>;
+                default:
+                    return content;
+            }
+        }, text);
+    }
 
     function EditorBlocks({ node }: { node: any }) {
         if (node.type === "paragraph") {
             return (
                 <p className="my-5 text-lg leading-relaxed text-secondary-foreground ">
-                    {node.content?.map((t: any) => t.text).join("")}
+                    {node.content?.map((t: any, i: number) => renderText(t, i))}
                 </p>
             );
         }
@@ -110,8 +137,7 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
         if (node.type === "heading") {
             return (
                 <h2 className="text-3xl  font-serif font-semibold mt-10 mb-4 text-primary-foreground">
-                    {node.content?.map((t: any) => t.text).join("")}
-
+                    {node.content?.map((t: any, i: number) => renderText(t, i))}
                 </h2>
             );
         }
@@ -120,7 +146,7 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
             return (
                 <ul className="space-y-2 text-secondary-foreground list-inside my-6 mx-6 list-disc pl-6">
                     {node.content?.map((item: any, i: number) => (
-                        <li key={i}>{item.content?.[0]?.content?.map((t: any) => t.text).join("")}</li>
+                        <li key={i}>{item.content?.[0]?.content?.map((t: any, j: number) => renderText(t, j))}</li>
                     ))}
 
                 </ul>
@@ -132,7 +158,7 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
                 <ol className="space-y-2 marker:font-semibold marker:text-primary-foreground text-secondary-foreground list-inside pl-6 mx-6 list-decimal my-6">
                     {node.content?.map((item: any, i: number) => (<li
                         key={i} >
-                        {item.content?.[0]?.content?.map((t: any) => t.text)}
+                        {item.content?.[0]?.content?.map((t: any, j: number) => renderText(t, j))}
 
                     </li>))}
 
