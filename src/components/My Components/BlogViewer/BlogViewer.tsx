@@ -240,12 +240,21 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
 
                             }
 
+                            const isOdd = block.images.length % 2 !== 0;
+                            const gridimage = isOdd ? block.images.slice(0, -1) : block.images;
+                            const lastimage = isOdd ? block.images[block.images.length - 1] : null;
+
                             return (
                                 <div key={i}
-                                    className="grid grid-cols-2 gap-3 my-8"
-                                > {block.images.map((src: string, j: number) =>
-                                    <img key={j} src={src} className="h-full object-cover rounded-lg" />
-                                )}
+                                    className="my-8"
+                                >
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {gridimage.images.map((src: string, j: number) =>
+                                            <img key={j} src={src} className="h-full object-cover rounded-lg" />
+                                        )}
+                                    </div>
+
+                                    {lastimage && <img src={lastimage} className="w-full h-full object-cover rounded-lg mt-3"/>}
                                 </div>
                             );
                         }
