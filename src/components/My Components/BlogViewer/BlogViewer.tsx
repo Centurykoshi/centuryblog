@@ -249,12 +249,12 @@ export default function BlogViewer({ intialBlogs }: { intialBlogs: Blogs }) {
                                     className="my-8"
                                 >
                                     <div className="grid grid-cols-2 gap-3">
-                                        {gridimage.images.map((src: string, j: number) =>
+                                        {gridimage.map((src: string, j: number) =>
                                             <img key={j} src={src} className="h-full object-cover rounded-lg" />
                                         )}
                                     </div>
 
-                                    {lastimage && <img src={lastimage} className="w-full h-full object-cover rounded-lg mt-3"/>}
+                                    {lastimage && <img src={lastimage} className="w-full h-full object-cover rounded-lg mt-3" />}
                                 </div>
                             );
                         }
